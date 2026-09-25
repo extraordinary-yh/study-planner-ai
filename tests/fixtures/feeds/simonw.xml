@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Simon Willison's Weblog</title>
+  <entry>
+    <title>Notes on building MCP servers for coding agents</title>
+    <link rel="alternate" href="https://simonwillison.net/2026/Sep/6/mcp-agents/"/>
+    <published>2026-09-06T08:00:00+00:00</published>
+    <summary type="html">&lt;p&gt;Tool use, evals and the agent loop.&lt;/p&gt;</summary>
+  </entry>
+  <entry>
+    <title>A recipe for sourdough</title>
+    <link rel="alternate" href="https://simonwillison.net/2026/Sep/5/sourdough/"/>
+    <published>2026-09-05T20:00:00+00:00</published>
+    <summary type="html">Bread.</summary>
+  </entry>
+  <entry>
+    <title>Old post about Claude</title>
+    <link rel="alternate" href="https://simonwillison.net/2026/Aug/1/old/"/>
+    <published>2026-08-01T08:00:00+00:00</published>
+    <summary>Very old.</summary>
+  </entry>
+</feed>

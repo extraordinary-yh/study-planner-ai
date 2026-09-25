@@ -1,0 +1,448 @@
+terms:
+- name: TypeScript
+  patterns:
+  - \btypescript\b
+  - \bts\b(?!\s*file)
+  category: language
+  depth: none
+- name: JavaScript
+  patterns:
+  - \bjavascript\b
+  - \bes6\b
+  category: language
+  depth: none
+- name: Python
+  patterns:
+  - \bpython\b
+  category: language
+  depth: none
+- name: Go
+  patterns:
+  - \bgolang\b
+  - \bgo\b(?=\s*[,/]\s*[A-Z]|\s+(?:and|or)\s+[A-Z])
+  - (?:[,/]|\bor|\band)\s*go\b(?![\s-]*(?:to|through|live|beyond|from|into|for|with|the|a|an|as|out|on|over|deep))
+  category: language
+  depth: none
+- name: Java
+  patterns:
+  - \bjava\b(?!script)
+  category: language
+  depth: none
+- name: C++
+  patterns:
+  - c\+\+
+  category: language
+  depth: none
+- name: Rust
+  patterns:
+  - \brust\b
+  category: language
+  depth: none
+- name: Kotlin
+  patterns:
+  - \bkotlin\b
+  category: language
+  depth: none
+- name: Swift
+  patterns:
+  - \bswift\b(?!\s*pay)
+  category: language
+  depth: none
+- name: C#
+  patterns:
+  - \bc#
+  - \.net\b
+  category: language
+  depth: none
+- name: Ruby
+  patterns:
+  - \bruby\b
+  - \brails\b
+  category: language
+  depth: none
+- name: Scala
+  patterns:
+  - \bscala\b
+  category: language
+  depth: none
+- name: SQL
+  patterns:
+  - \bsql\b
+  category: language
+  depth: none
+- name: React
+  patterns:
+  - \breact\b(?!\s*native)
+  category: frontend
+  depth: none
+- name: Next.js
+  patterns:
+  - \bnext\.?js\b
+  category: frontend
+  depth: none
+- name: React Native
+  patterns:
+  - react\s*native
+  category: frontend
+  depth: none
+- name: Tailwind
+  patterns:
+  - \btailwind
+  category: frontend
+  depth: none
+- name: GraphQL
+  patterns:
+  - \bgraphql\b
+  category: frontend
+  depth: none
+- name: Node.js
+  patterns:
+  - \bnode\.?js\b
+  - \bnodejs\b
+  - \bnode\b(?=[\s,/]+(?:express|nest|typescript|backend|services?|\())
+  category: backend
+  depth: none
+- name: NestJS
+  patterns:
+  - \bnest\.?js\b
+  category: backend
+  depth: none
+- name: FastAPI
+  patterns:
+  - \bfastapi\b
+  category: backend
+  depth: none
+- name: Django
+  patterns:
+  - \bdjango\b
+  category: backend
+  depth: none
+- name: Flask
+  patterns:
+  - \bflask\b
+  category: backend
+  depth: none
+- name: Spring
+  patterns:
+  - \bspring\s*boot\b
+  - \bspring\b(?=\s*(framework|mvc|cloud))
+  category: backend
+  depth: none
+- name: gRPC
+  patterns:
+  - \bgrpc\b
+  - \bprotobuf\b
+  - protocol buffers
+  category: backend
+  depth: none
+- name: REST APIs
+  patterns:
+  - \brest(ful)?\s*api
+  category: backend
+  depth: none
+- name: WebSockets
+  patterns:
+  - \bwebsockets?\b
+  - server-sent events
+  - \bsse\b
+  category: backend
+  depth: none
+- name: PostgreSQL
+  patterns:
+  - \bpostgres(ql)?\b
+  category: data
+  depth: none
+- name: MySQL
+  patterns:
+  - \bmysql\b
+  category: data
+  depth: none
+- name: MongoDB
+  patterns:
+  - \bmongo(db)?\b
+  category: data
+  depth: none
+- name: Redis
+  patterns:
+  - \bredis\b
+  category: data
+  depth: none
+- name: Elasticsearch
+  patterns:
+  - \belasticsearch\b
+  - \bopensearch\b
+  category: data
+  depth: none
+- name: DynamoDB
+  patterns:
+  - \bdynamodb\b
+  category: data
+  depth: none
+- name: Cassandra
+  patterns:
+  - \bcassandra\b
+  category: data
+  depth: none
+- name: BigQuery
+  patterns:
+  - \bbigquery\b
+  category: data
+  depth: none
+- name: Snowflake
+  patterns:
+  - \bsnowflake\b
+  category: data
+  depth: none
+- name: Spark
+  patterns:
+  - \b(apache\s+)?spark\b
+  category: data
+  depth: none
+- name: Vector DB
+  patterns:
+  - \bvector\s*(database|db|store|search)
+  - \bpinecone\b
+  - \bpgvector\b
+  - \bweaviate\b
+  - \bqdrant\b
+  - \bmilvus\b
+  category: data
+  depth: none
+- name: Prisma
+  patterns:
+  - \bprisma\b
+  category: data
+  depth: none
+- name: Kafka
+  patterns:
+  - \bkafka\b
+  category: messaging
+  depth: none
+- name: Pub/Sub
+  patterns:
+  - \bpub/?sub\b
+  - \bsqs\b
+  - \brabbitmq\b
+  - message queue
+  category: messaging
+  depth: none
+- name: Temporal
+  patterns:
+  - \btemporal(\.io)?\b
+  category: messaging
+  depth: none
+- name: Airflow
+  patterns:
+  - \bairflow\b
+  - \bdagster\b
+  - \bprefect\b
+  category: messaging
+  depth: none
+- name: AWS
+  patterns:
+  - \baws\b
+  - amazon web services
+  category: infra
+  depth: none
+- name: GCP
+  patterns:
+  - \bgcp\b
+  - google cloud
+  category: infra
+  depth: none
+- name: Azure
+  patterns:
+  - \bazure\b
+  category: infra
+  depth: none
+- name: Docker
+  patterns:
+  - \bdocker\b
+  - \bcontainers?\b
+  category: infra
+  depth: none
+- name: Kubernetes
+  patterns:
+  - \bkubernetes\b
+  - \bk8s\b
+  category: infra
+  depth: none
+- name: Terraform
+  patterns:
+  - \bterraform\b
+  - \bpulumi\b
+  - infrastructure as code
+  category: infra
+  depth: none
+- name: CI/CD
+  patterns:
+  - \bci/cd\b
+  - \bgithub actions\b
+  - continuous integration
+  category: infra
+  depth: none
+- name: Observability
+  patterns:
+  - \bdatadog\b
+  - \bgrafana\b
+  - \bprometheus\b
+  - \bopentelemetry\b
+  - \bobservability\b
+  category: infra
+  depth: none
+- name: Serverless
+  patterns:
+  - \bserverless\b
+  - \blambda\b
+  - cloud functions
+  - cloud run
+  - \bmodal\b
+  category: infra
+  depth: none
+- name: LLM apps
+  patterns:
+  - \bllms?\b
+  - large language model
+  - foundation model
+  - \bgenai\b
+  - generative ai
+  category: ai
+  depth: none
+- name: Agents
+  patterns:
+  - \bagentic\b
+  - \bai agents?\b
+  - \bagents?\b(?=\s+(that|which|to|for|and|workflows?|frameworks?))
+  category: ai
+  depth: none
+- name: RAG
+  patterns:
+  - \brag\b
+  - retrieval[- ]augmented
+  - \bembeddings?\b
+  category: ai
+  depth: none
+- name: Evals
+  patterns:
+  - \bevals?\b
+  - \bevaluations? (framework|harness|pipeline|suite)
+  - \bbenchmarks?\b
+  category: ai
+  depth: none
+- name: Prompt engineering
+  patterns:
+  - \bprompt(ing| engineering| design)\b
+  category: ai
+  depth: none
+- name: MCP
+  patterns:
+  - \bmcp\b
+  - model context protocol
+  - \btool[- ]use\b
+  - function calling
+  category: ai
+  depth: none
+- name: LangChain/LangGraph
+  patterns:
+  - \blangchain\b
+  - \blanggraph\b
+  - \bllamaindex\b
+  category: ai
+  depth: none
+- name: Fine-tuning
+  patterns:
+  - \bfine[- ]?tun(e|ing)\b
+  - \blora\b
+  - \brlhf\b
+  category: ai
+  depth: none
+- name: RL environments
+  patterns:
+  - \brl\b
+  - reinforcement learning
+  - \brl environments?\b
+  - \breward model
+  category: ai
+  depth: none
+- name: PyTorch
+  patterns:
+  - \bpytorch\b
+  - \btensorflow\b
+  - \bjax\b
+  category: ai
+  depth: none
+- name: Model serving
+  patterns:
+  - \bvllm\b
+  - \btriton\b
+  - \binference (server|serving|engine)
+  - model serving
+  - \bsglang\b
+  category: ai
+  depth: none
+- name: Speech/Audio
+  patterns:
+  - \btext-to-speech\b
+  - \btts\b
+  - \basr\b
+  - speech recognition
+  - \bvoice\b
+  category: ai
+  depth: none
+- name: Computer vision
+  patterns:
+  - computer vision
+  - \bopencv\b
+  - image (generation|models?)
+  - video (generation|models?)
+  category: ai
+  depth: none
+- name: Distributed systems
+  patterns:
+  - distributed systems?
+  - \bmicroservices?\b
+  - high[- ]availability
+  - \bfault[- ]tolerant
+  category: practice
+  depth: none
+- name: System design
+  patterns:
+  - system design
+  - \barchitecture\b
+  category: practice
+  depth: none
+- name: Data structures & algorithms
+  patterns:
+  - data structures
+  - \balgorithms\b
+  category: practice
+  depth: none
+- name: Testing
+  patterns:
+  - unit test
+  - integration test
+  - \btdd\b
+  - test-driven
+  - \bplaywright\b
+  - \bcypress\b
+  category: practice
+  depth: none
+- name: Auth & security
+  patterns:
+  - \boauth\b
+  - \bauthentication\b
+  - \bauthorization\b
+  - \bapplication security\b
+  - \bsecure coding\b
+  category: practice
+  depth: none
+- name: Product analytics
+  patterns:
+  - \ba/b test
+  - experimentation
+  - \bmixpanel\b
+  - \bamplitude\b
+  - \bposthog\b
+  - feature flags?
+  category: practice
+  depth: none

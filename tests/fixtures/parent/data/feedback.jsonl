@@ -1,0 +1,6 @@
+{"ts": "2026-09-02T11:43:03", "job_id": "stripe:2", "verdict": "applied", "note": "applied 2026-09-02"}
+{"ts": "2026-09-02T11:43:03", "job_id": "google:3", "verdict": "applied", "note": "applied 2026-09-02"}
+{"ts": "2026-09-03T09:00:00", "job_id": "mercor:1", "verdict": "applied", "note": ""}
+{"ts": "2026-09-05T09:00:00", "job_id": "mercor:1", "verdict": "applied", "stage": "phone", "note": "recruiter call"}
+{"ts": "2026-09-04T09:00:00", "job_id": "stripe:2", "kind": "followup", "note": "pinged recruiter"}
+{"ts": "2026-09-04T09:00:00", "job_id": "apple:4", "verdict": "bad", "note": "too senior"}

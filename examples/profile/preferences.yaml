@@ -1,0 +1,74 @@
+daily_minutes: 90
+weekend_minutes: 60
+weights:
+  news: 0.05
+  stack: 0.15
+  system_design: 0.3
+  leetcode: 0.4
+  stories: 0.1
+modifiers:
+  interview_within_days: 7
+  interview_stories_factor: 3
+  interview_system_design_factor: 1.5
+  weak_coding_below: 3
+  weak_coding_factor: 1.5
+  weak_design_below: 2
+  weak_design_factor: 1.5
+leetcode:
+  minutes_per_new:
+    easy: 15
+    medium: 30
+    hard: 45
+  minutes_per_review: 12
+  max_reviews_per_day: 4
+  max_new_per_day: 3
+  clean_bar_minutes:
+    easy: 15
+    medium: 30
+    hard: 45
+  review_intervals_days:
+    gave_up: 1
+    solution: 1
+    hint: 3
+    slow: 3
+    clean:
+    - 7
+    - 21
+    - 60
+  weakness_window_days: 90
+  coverage_min_attempts: 3
+stack:
+  top_min_score: 75
+  max_terms: 25
+news:
+  hours: 36
+  max_items: 12
+  topics:
+    agent: 3
+    agents: 3
+    mcp: 3
+    tool use: 2
+    eval: 2
+    evals: 2
+    rl environment: 3
+    reinforcement learning: 2
+    inference: 2
+    context window: 1
+    long context: 1
+    voice: 2
+    text-to-speech: 2
+    video: 2
+    image generation: 1
+    coding: 2
+    claude: 2
+    openai: 2
+    gemini: 2
+    anthropic: 2
+    open source: 1
+    open-weight: 1
+    benchmark: 1
+    system design: 2
+    postgres: 1
+    temporal: 2
+    kubernetes: 1
+    rate limit: 1

@@ -1,0 +1,50 @@
+feeds:
+- key: hn_ai
+  enabled: false
+  name: Hacker News (AI, 50+ points)
+  url: https://hnrss.org/newest?q=LLM+OR+AI+OR+agent&points=50
+  unverified: true
+- key: simonw
+  name: Simon Willison
+  url: https://simonwillison.net/atom/everything/
+  enabled: false
+- key: latent_space
+  name: Latent Space
+  url: https://www.latent.space/feed
+  unverified: true
+  enabled: false
+- key: import_ai
+  name: Import AI (Jack Clark)
+  url: https://importai.substack.com/feed
+  unverified: true
+  enabled: false
+- key: the_batch
+  enabled: false
+  name: The Batch (DeepLearning.AI)
+  url: https://www.deeplearning.ai/the-batch/feed/
+  unverified: true
+- key: hf_blog
+  name: Hugging Face blog
+  url: https://huggingface.co/blog/feed.xml
+  unverified: true
+  enabled: false
+- key: ai_examples
+  name: Google AI blog
+  url: https://blog.google/technology/ai/rss/
+  unverified: true
+  enabled: false
+- key: anthropic
+  enabled: false
+  name: Anthropic news
+  url: https://www.anthropic.com/rss.xml
+  unverified: true
+- key: openai
+  name: OpenAI news
+  url: https://openai.com/news/rss.xml
+  unverified: true
+  enabled: false
+- key: bytebytego
+  name: ByteByteGo (system design)
+  url: https://blog.bytebytego.com/feed
+  unverified: true
+  enabled: false

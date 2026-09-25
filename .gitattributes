@@ -1,0 +1,5 @@
+# Preserve recorded external parser fixtures and third-party license text.
+tests/fixtures/** -whitespace
+assets/fonts/** -whitespace
+*.png binary
+*.ttf binary

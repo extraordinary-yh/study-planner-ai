@@ -1,0 +1,49 @@
+{
+  "accessRole": "owner",
+  "summary": "alex@example.com",
+  "timeZone": "America/Los_Angeles",
+  "events": [
+    {
+      "id": "_synthetic_calendar_event",
+      "summary": "Call with a recruiter",
+      "status": "confirmed",
+      "eventType": "DEFAULT",
+      "location": "Microsoft Teams Meeting",
+      "htmlLink": "https://www.google.com/calendar/event?eid=abc123",
+      "start": {"dateTime": "2026-09-07T09:00:00-07:00", "timeZone": "America/Los_Angeles"},
+      "end":   {"dateTime": "2026-09-07T09:25:00-07:00", "timeZone": "America/Los_Angeles"},
+      "attendees": [{"email": "alex@example.com", "self": true, "responseStatus": "accepted"}]
+    },
+    {
+      "id": "afternoon-standup",
+      "summary": "Team sync",
+      "status": "confirmed",
+      "eventType": "DEFAULT",
+      "start": {"dateTime": "2026-09-07T13:30:00-07:00"},
+      "end":   {"dateTime": "2026-09-07T14:00:00-07:00"}
+    },
+    {
+      "id": "holiday-1",
+      "summary": "Labor Day",
+      "eventType": "DEFAULT",
+      "start": {"date": "2026-09-07"},
+      "end":   {"date": "2026-09-08"}
+    },
+    {
+      "id": "declined-1",
+      "summary": "A meeting Alex declined",
+      "start": {"dateTime": "2026-09-07T15:00:00-07:00"},
+      "end":   {"dateTime": "2026-09-07T16:00:00-07:00"},
+      "attendees": [{"email": "alex@example.com", "self": true, "responseStatus": "declined"}]
+    },
+    {"id": "wl-1", "summary": "Home", "eventType": "WORKING_LOCATION",
+     "start": {"date": "2026-09-07"}, "end": {"date": "2026-09-08"}},
+    {"id": "cancelled-1", "summary": "Cancelled thing", "status": "cancelled",
+     "start": {"dateTime": "2026-09-07T11:00:00-07:00"}, "end": {"dateTime": "2026-09-07T12:00:00-07:00"}},
+    {"id": "other-day", "summary": "Tomorrow's thing",
+     "start": {"dateTime": "2026-09-08T10:00:00-07:00"}, "end": {"dateTime": "2026-09-08T11:00:00-07:00"}},
+    {"id": "overnight", "summary": "Red-eye flight",
+     "start": {"dateTime": "2026-09-06T22:00:00-07:00"}, "end": {"dateTime": "2026-09-07T06:30:00-07:00"}},
+    {"id": "broken-1", "summary": "No start at all", "end": {"dateTime": "2026-09-07T12:00:00-07:00"}}
+  ]
+}

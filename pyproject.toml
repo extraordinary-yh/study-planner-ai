@@ -1,0 +1,31 @@
+[project]
+name = "studyplan"
+version = "0.1.0"
+description = "AI-native interview practice with bounded plans, spaced repetition, and evidence-based coaching"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+studyplan = "studyplan.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "playwright>=1.47"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["studyplan"]
+include = ["studyplan/static/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "browser: needs Playwright Chromium (skipped when it cannot launch)",
+]
+pythonpath = ["."]   # tests import studyplan from the source tree, not only from the editable install

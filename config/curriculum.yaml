@@ -1,0 +1,281 @@
+resources:
+  primer:
+    label: System Design Primer
+    url: https://github.com/donnemartin/system-design-primer#index-of-system-design-topics
+  hello:
+    label: Hello Interview — Introduction (orientation)
+    url: https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction
+  hello_delivery:
+    label: Hello Interview — Delivery Framework (required)
+    url: https://www.hellointerview.com/learn/system-design/in-a-hurry/delivery
+  ddia: https://dataintensive.net/
+  bbg: https://bytebytego.com/courses/system-design-interview/foreword
+  sre: https://sre.google/sre-book/table-of-contents/
+  Temporal docs: https://docs.temporal.io/workflows
+  Anthropic 'Building effective agents': https://www.anthropic.com/research/building-effective-agents
+  Statsig docs: https://docs.statsig.com/feature-flags/overview
+modules:
+- id: m1
+  title: Fundamentals and the interview format
+  lessons:
+  - id: m1l1
+    title: What a system-design interview actually tests
+    minutes: 45
+    start_resource: hello_delivery
+    read: 'hello_delivery: Delivery Framework (required); hello: Introduction (orientation);
+      primer: reference only, ''How to approach a system design interview question'''
+    do: Use a fictional task-management app to explain what a system-design interview
+      actually tests. Draw one design, one tradeoff, and one failure case.
+  - id: m1l2
+    title: Back-of-envelope estimation
+    minutes: 60
+    read: 'primer: ''Powers of two table'' and ''Latency numbers every programmer
+      should know''; bbg ch. 2'
+    do: Use a fictional task-management app to explain back-of-envelope estimation.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m1l3
+    title: Requirements and API design
+    minutes: 45
+    read: 'hello: core concepts (functional vs non-functional requirements); primer:
+      ''REST vs RPC'''
+    do: Use a fictional task-management app to explain requirements and api design.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m1l4
+    title: Applied foundations before deep-dive probes
+    minutes: 90
+    read: 'primer: the relevant core concepts; use the exercise to explain your reasoning'
+    do: Use a fictional task-management app to explain applied foundations before
+      deep-dive probes. Draw one design, one tradeoff, and one failure case.
+- id: m2
+  title: Storage
+  lessons:
+  - id: m2l1
+    title: Relational vs document vs key-value; indexes
+    minutes: 60
+    read: 'ddia ch. 2–3 (data models, storage engines); primer: ''Database'''
+    do: Use a fictional task-management app to explain relational vs document vs key-value;
+      indexes. Draw one design, one tradeoff, and one failure case.
+  - id: m2l2
+    title: Replication and consistency
+    minutes: 60
+    read: 'ddia ch. 5 (replication) and ch. 9 first half (linearizability); hello:
+      consistency patterns'
+    do: Use a fictional task-management app to explain replication and consistency.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m2l3
+    title: Partitioning / sharding
+    minutes: 60
+    read: 'ddia ch. 6; primer: ''Sharding'' and ''Federation'''
+    do: Use a fictional task-management app to explain partitioning / sharding. Draw
+      one design, one tradeoff, and one failure case.
+  - id: m2l4
+    title: Caching
+    minutes: 45
+    read: 'primer: ''Cache'' (all patterns) ; bbg ch. 1 cache section'
+    do: Use a fictional task-management app to explain caching. Draw one design, one
+      tradeoff, and one failure case.
+  - id: m2l5
+    title: Object storage and CDNs
+    minutes: 30
+    read: 'primer: ''Content delivery network''; any GCS/S3 signed-URL doc'
+    do: Use a fictional task-management app to explain object storage and cdns. Draw
+      one design, one tradeoff, and one failure case.
+- id: m3
+  title: Scaling the request path
+  lessons:
+  - id: m3l1
+    title: Load balancing, stateless services, horizontal scaling
+    minutes: 45
+    read: 'primer: ''Load balancer'', ''Reverse proxy'', ''Application layer'''
+    do: Use a fictional task-management app to explain load balancing, stateless services,
+      horizontal scaling. Draw one design, one tradeoff, and one failure case.
+  - id: m3l2
+    title: Rate limiting and admission control
+    minutes: 45
+    read: 'bbg ch. 4 (rate limiter); hello: rate limiter pattern'
+    do: Use a fictional task-management app to explain rate limiting and admission
+      control. Draw one design, one tradeoff, and one failure case.
+  - id: m3l3
+    title: 'Asynchronous work: queues, workers, idempotency'
+    minutes: 60
+    read: 'primer: ''Asynchronism'' and ''Message queues''; ddia ch. 11 first half'
+    do: 'Use a fictional task-management app to explain asynchronous work: queues,
+      workers, idempotency. Draw one design, one tradeoff, and one failure case.'
+  - id: m3l4
+    title: Durable workflows (Temporal) vs hand-rolled state machines
+    minutes: 60
+    read: 'Temporal docs: ''What is a workflow'' and ''Activities, retries, heartbeats'''
+    do: Use a fictional task-management app to explain durable workflows (temporal)
+      vs hand-rolled state machines. Draw one design, one tradeoff, and one failure
+      case.
+- id: m4
+  title: Communication and real-time
+  lessons:
+  - id: m4l1
+    title: Polling, long polling, SSE, WebSockets
+    minutes: 45
+    read: 'primer: ''Communication''; hello: real-time updates pattern'
+    do: Use a fictional task-management app to explain polling, long polling, sse,
+      websockets. Draw one design, one tradeoff, and one failure case.
+  - id: m4l2
+    title: API gateways, gRPC, GraphQL, versioning
+    minutes: 30
+    read: 'primer: ''REST vs RPC''; any gRPC intro'
+    do: Use a fictional task-management app to explain api gateways, grpc, graphql,
+      versioning. Draw one design, one tradeoff, and one failure case.
+- id: m5
+  title: Reliability and operations
+  lessons:
+  - id: m5l1
+    title: 'Failure modes: timeouts, retries, circuit breakers, bulkheads'
+    minutes: 60
+    read: 'sre ch. 22 (cascading failures); primer: ''Availability patterns'''
+    do: 'Use a fictional task-management app to explain failure modes: timeouts, retries,
+      circuit breakers, bulkheads. Draw one design, one tradeoff, and one failure
+      case.'
+  - id: m5l2
+    title: Observability, SLOs, rollouts, feature flags
+    minutes: 45
+    read: 'sre ch. 4 (SLOs) and ch. 6 (monitoring); Statsig docs: gates vs experiments'
+    do: Use a fictional task-management app to explain observability, slos, rollouts,
+      feature flags. Draw one design, one tradeoff, and one failure case.
+  - id: m5l3
+    title: Multi-vendor pipelines and graceful degradation
+    minutes: 45
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain multi-vendor pipelines and
+      graceful degradation. Draw one design, one tradeoff, and one failure case.
+- id: m6
+  title: AI-system patterns
+  lessons:
+  - id: m6l1
+    title: 'LLM gateway: routing, fallbacks, cost, caching'
+    minutes: 45
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: 'Use a fictional task-management app to explain llm gateway: routing, fallbacks,
+      cost, caching. Draw one design, one tradeoff, and one failure case.'
+  - id: m6l2
+    title: Agents with human-in-the-loop
+    minutes: 60
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain agents with human-in-the-loop.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m6l3
+    title: RAG and evals as infrastructure
+    minutes: 60
+    read: any RAG architecture overview (chunking, embeddings, hybrid search, reranking);
+      an evals primer (task-based, LLM-as-judge, regression suites)
+    do: Use a fictional task-management app to explain rag and evals as infrastructure.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m6l4
+    title: Media generation pipelines end to end
+    minutes: 60
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain media generation pipelines
+      end to end. Draw one design, one tradeoff, and one failure case.
+- id: m7
+  title: Classic questions, one per day
+  lessons:
+  - id: m7l1
+    title: URL shortener / unique id generator
+    minutes: 45
+    read: bbg ch. 7–8
+    do: Use a fictional task-management app to explain url shortener / unique id generator.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m7l2
+    title: News feed / timeline
+    minutes: 45
+    read: bbg ch. 11
+    do: Use a fictional task-management app to explain news feed / timeline. Draw
+      one design, one tradeoff, and one failure case.
+  - id: m7l3
+    title: Chat system
+    minutes: 45
+    read: bbg ch. 12
+    do: Use a fictional task-management app to explain chat system. Draw one design,
+      one tradeoff, and one failure case.
+  - id: m7l4
+    title: Notification system
+    minutes: 45
+    read: bbg ch. 10
+    do: Use a fictional task-management app to explain notification system. Draw one
+      design, one tradeoff, and one failure case.
+  - id: m7l5
+    title: Metering and billing
+    minutes: 45
+    read: ddia ch. 7 (transactions) refresher
+    do: Use a fictional task-management app to explain metering and billing. Draw
+      one design, one tradeoff, and one failure case.
+  - id: m7l6
+    title: Search autocomplete / typeahead
+    minutes: 45
+    read: bbg ch. 13
+    do: Use a fictional task-management app to explain search autocomplete / typeahead.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m7l7
+    title: Video streaming (YouTube)
+    minutes: 45
+    read: bbg ch. 14
+    do: Use a fictional task-management app to explain video streaming (youtube).
+      Draw one design, one tradeoff, and one failure case.
+  - id: m7l8
+    title: Distributed cache / key-value store
+    minutes: 45
+    read: bbg ch. 6
+    do: Use a fictional task-management app to explain distributed cache / key-value
+      store. Draw one design, one tradeoff, and one failure case.
+- id: m8
+  title: Mock rounds
+  lessons:
+  - id: m8l1
+    title: Mock 1 (with the agent as interviewer)
+    minutes: 50
+    read: none
+    do: Use a fictional task-management app to explain mock 1 (with the agent as interviewer).
+      Draw one design, one tradeoff, and one failure case.
+  - id: m8l2
+    title: Mock 2
+    minutes: 50
+    read: none
+    do: Use a fictional task-management app to explain mock 2. Draw one design, one
+      tradeoff, and one failure case.
+  - id: m8l3
+    title: Mock 3 (your own system, hostile follow-ups)
+    minutes: 50
+    read: none
+    do: Use a fictional task-management app to explain mock 3 (your own system, hostile
+      follow-ups). Draw one design, one tradeoff, and one failure case.
+- id: m9
+  title: Agentic engineering (how you build with agents, and how to say it)
+  lessons:
+  - id: m9l1
+    title: Design readback before build
+    minutes: 30
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain design readback before build.
+      Draw one design, one tradeoff, and one failure case.
+  - id: m9l2
+    title: Verification contracts and proof of work
+    minutes: 30
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain verification contracts and
+      proof of work. Draw one design, one tradeoff, and one failure case.
+  - id: m9l3
+    title: Skills, runbooks and the self-improvement loop
+    minutes: 30
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain skills, runbooks and the self-improvement
+      loop. Draw one design, one tradeoff, and one failure case.
+  - id: m9l4
+    title: Sessions, worktrees and parallel agents without conflicts
+    minutes: 30
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: Use a fictional task-management app to explain sessions, worktrees and parallel
+      agents without conflicts. Draw one design, one tradeoff, and one failure case.
+  - id: m9l5
+    title: 'The interview answer: how I build with AI and keep it correct'
+    minutes: 45
+    read: 'primer: review core concepts, then apply them to a fictional project'
+    do: 'Use a fictional task-management app to explain the interview answer: how
+      i build with ai and keep it correct. Draw one design, one tradeoff, and one
+      failure case.'

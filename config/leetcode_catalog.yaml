@@ -1,0 +1,1029 @@
+problems:
+  1:
+  - easy
+  - Array, Hash Table
+  2:
+  - medium
+  - Linked List, Math
+  3:
+  - medium
+  - Hash Table, String, Sliding Window
+  4:
+  - hard
+  - Array, Binary Search
+  5:
+  - medium
+  - String, Dynamic Programming
+  7:
+  - medium
+  - Math
+  8:
+  - medium
+  - String
+  9:
+  - easy
+  - Math
+  11:
+  - medium
+  - Array, Two Pointers, Greedy
+  12:
+  - medium
+  - Hash Table, Math, String
+  13:
+  - easy
+  - Hash Table, Math, String
+  14:
+  - easy
+  - String, Trie
+  15:
+  - medium
+  - Array, Two Pointers, Sorting
+  16:
+  - medium
+  - Array, Two Pointers, Sorting
+  17:
+  - medium
+  - Hash Table, String, Backtracking
+  18:
+  - medium
+  - Array, Two Pointers, Sorting
+  19:
+  - medium
+  - Linked List, Two Pointers
+  20:
+  - easy
+  - String, Stack
+  21:
+  - easy
+  - Linked List, Recursion
+  22:
+  - medium
+  - String, Dynamic Programming, Backtracking
+  23:
+  - hard
+  - Linked List, Heap (Priority Queue), Divide and Conquer
+  26:
+  - easy
+  - Array, Two Pointers
+  27:
+  - easy
+  - Array, Two Pointers
+  29:
+  - medium
+  - Math, Bit Manipulation
+  31:
+  - medium
+  - Array, Two Pointers
+  33:
+  - medium
+  - Array, Binary Search
+  34:
+  - medium
+  - Array, Binary Search
+  35:
+  - easy
+  - Array, Binary Search
+  36:
+  - medium
+  - Array, Hash Table, Matrix
+  37:
+  - hard
+  - Array, Backtracking, Matrix
+  39:
+  - medium
+  - Array, Backtracking
+  40:
+  - medium
+  - Array, Backtracking
+  42:
+  - hard
+  - Array, Two Pointers, Dynamic Programming, Stack, Monotonic Stack
+  45:
+  - medium
+  - Array, Dynamic Programming, Greedy
+  47:
+  - medium
+  - Array, Backtracking
+  48:
+  - medium
+  - Array, Math, Matrix
+  49:
+  - medium
+  - Array, Hash Table, String, Sorting
+  50:
+  - medium
+  - Math, Recursion
+  51:
+  - hard
+  - Array, Backtracking
+  53:
+  - medium
+  - Array, Dynamic Programming, Divide and Conquer
+  54:
+  - medium
+  - Array, Matrix
+  55:
+  - medium
+  - Array, Dynamic Programming, Greedy
+  56:
+  - medium
+  - Array, Sorting, Intervals
+  57:
+  - medium
+  - Array, Intervals
+  59:
+  - medium
+  - Array, Matrix
+  61:
+  - medium
+  - Linked List, Two Pointers
+  62:
+  - medium
+  - Math, Dynamic Programming
+  64:
+  - medium
+  - Array, Dynamic Programming, Matrix
+  65:
+  - hard
+  - String
+  66:
+  - easy
+  - Array, Math
+  67:
+  - easy
+  - Math, String, Bit Manipulation
+  69:
+  - easy
+  - Math, Binary Search
+  70:
+  - easy
+  - Math, Dynamic Programming
+  71:
+  - medium
+  - String, Stack
+  72:
+  - medium
+  - String, Dynamic Programming
+  74:
+  - medium
+  - Array, Binary Search, Matrix
+  75:
+  - medium
+  - Array, Two Pointers, Sorting
+  76:
+  - hard
+  - Hash Table, String, Sliding Window
+  77:
+  - medium
+  - Backtracking
+  78:
+  - medium
+  - Array, Backtracking, Bit Manipulation
+  79:
+  - medium
+  - Array, Backtracking, Matrix
+  80:
+  - medium
+  - Array, Two Pointers
+  88:
+  - easy
+  - Array, Two Pointers, Sorting
+  90:
+  - medium
+  - Array, Backtracking, Bit Manipulation
+  91:
+  - medium
+  - String, Dynamic Programming
+  98:
+  - medium
+  - Tree, Depth-First Search, Binary Search Tree
+  100:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  101:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  102:
+  - medium
+  - Tree, Breadth-First Search
+  103:
+  - medium
+  - Tree, Breadth-First Search
+  104:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  105:
+  - medium
+  - Array, Hash Table, Divide and Conquer, Tree
+  106:
+  - medium
+  - Array, Hash Table, Divide and Conquer, Tree
+  108:
+  - easy
+  - Array, Divide and Conquer, Tree, Binary Search Tree
+  110:
+  - easy
+  - Tree, Depth-First Search
+  116:
+  - medium
+  - Linked List, Tree, Breadth-First Search
+  120:
+  - medium
+  - Array, Dynamic Programming
+  121:
+  - easy
+  - Array, Dynamic Programming
+  122:
+  - medium
+  - Array, Dynamic Programming, Greedy
+  124:
+  - hard
+  - Dynamic Programming, Tree, Depth-First Search
+  125:
+  - easy
+  - Two Pointers, String
+  127:
+  - hard
+  - Hash Table, String, Breadth-First Search
+  128:
+  - medium
+  - Array, Hash Table, Union Find
+  129:
+  - medium
+  - Tree, Depth-First Search
+  130:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Union Find, Matrix
+  131:
+  - medium
+  - String, Dynamic Programming, Backtracking
+  133:
+  - medium
+  - Hash Table, Depth-First Search, Breadth-First Search, Graph
+  134:
+  - medium
+  - Array, Greedy
+  135:
+  - hard
+  - Array, Greedy
+  136:
+  - easy
+  - Array, Bit Manipulation
+  137:
+  - medium
+  - Array, Bit Manipulation
+  138:
+  - medium
+  - Hash Table, Linked List
+  139:
+  - medium
+  - Hash Table, String, Dynamic Programming, Trie
+  140:
+  - hard
+  - Hash Table, String, Dynamic Programming, Backtracking, Trie
+  141:
+  - easy
+  - Hash Table, Linked List, Two Pointers
+  146:
+  - medium
+  - Hash Table, Linked List, Design
+  148:
+  - medium
+  - Linked List, Two Pointers, Divide and Conquer, Sorting
+  150:
+  - medium
+  - Array, Math, Stack
+  151:
+  - medium
+  - Two Pointers, String
+  152:
+  - medium
+  - Array, Dynamic Programming
+  153:
+  - medium
+  - Array, Binary Search
+  155:
+  - medium
+  - Stack, Design
+  162:
+  - medium
+  - Array, Binary Search
+  165:
+  - medium
+  - Two Pointers, String
+  169:
+  - easy
+  - Array, Hash Table, Sorting
+  170:
+  - easy
+  - Array, Hash Table, Two Pointers, Design
+  173:
+  - medium
+  - Stack, Tree, Design, Binary Search Tree
+  187:
+  - medium
+  - Hash Table, String, Sliding Window
+  188:
+  - hard
+  - Array, Dynamic Programming
+  189:
+  - medium
+  - Array, Math, Two Pointers
+  190:
+  - easy
+  - Bit Manipulation
+  191:
+  - easy
+  - Bit Manipulation
+  198:
+  - medium
+  - Array, Dynamic Programming
+  199:
+  - medium
+  - Tree, Depth-First Search, Breadth-First Search
+  200:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Union Find, Matrix
+  201:
+  - medium
+  - Bit Manipulation
+  205:
+  - easy
+  - Hash Table, String
+  206:
+  - easy
+  - Linked List, Recursion
+  207:
+  - medium
+  - Depth-First Search, Breadth-First Search, Graph, Topological Sort
+  208:
+  - medium
+  - Hash Table, String, Design, Trie
+  209:
+  - medium
+  - Array, Binary Search, Sliding Window, Prefix Sum
+  210:
+  - medium
+  - Depth-First Search, Breadth-First Search, Graph, Topological Sort
+  211:
+  - medium
+  - String, Depth-First Search, Design, Trie
+  212:
+  - hard
+  - Array, String, Backtracking, Trie, Matrix
+  213:
+  - medium
+  - Array, Dynamic Programming
+  215:
+  - medium
+  - Array, Divide and Conquer, Sorting, Heap (Priority Queue)
+  216:
+  - medium
+  - Array, Backtracking
+  217:
+  - easy
+  - Array, Hash Table, Sorting
+  223:
+  - medium
+  - Math, Geometry
+  225:
+  - easy
+  - Stack, Design, Queue
+  226:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  227:
+  - medium
+  - Math, String, Stack
+  228:
+  - easy
+  - Array
+  230:
+  - medium
+  - Tree, Depth-First Search, Binary Search Tree
+  232:
+  - easy
+  - Stack, Design, Queue
+  234:
+  - easy
+  - Linked List, Two Pointers, Stack
+  235:
+  - medium
+  - Tree, Depth-First Search, Binary Search Tree
+  236:
+  - medium
+  - Tree, Depth-First Search
+  238:
+  - medium
+  - Array, Prefix Sum
+  239:
+  - hard
+  - Array, Sliding Window, Heap (Priority Queue), Monotonic Queue
+  240:
+  - medium
+  - Array, Binary Search, Divide and Conquer, Matrix
+  242:
+  - easy
+  - Hash Table, String, Sorting
+  252:
+  - easy
+  - Array, Sorting, Intervals
+  253:
+  - medium
+  - Array, Two Pointers, Greedy, Sorting, Heap (Priority Queue), Intervals
+  258:
+  - easy
+  - Math
+  259:
+  - medium
+  - Array, Two Pointers, Sorting
+  261:
+  - medium
+  - Depth-First Search, Breadth-First Search, Union Find, Graph
+  268:
+  - easy
+  - Array, Hash Table, Math, Bit Manipulation
+  269:
+  - hard
+  - Array, String, Depth-First Search, Breadth-First Search, Graph, Topological Sort
+  270:
+  - easy
+  - Binary Search, Tree, Binary Search Tree
+  271:
+  - medium
+  - Array, String, Design
+  274:
+  - medium
+  - Array, Sorting
+  278:
+  - easy
+  - Binary Search
+  290:
+  - easy
+  - Hash Table, String
+  295:
+  - hard
+  - Two Pointers, Design, Sorting, Heap (Priority Queue)
+  297:
+  - hard
+  - String, Tree, Depth-First Search, Breadth-First Search, Design
+  300:
+  - medium
+  - Array, Binary Search, Dynamic Programming
+  303:
+  - easy
+  - Array, Design, Prefix Sum
+  307:
+  - medium
+  - Array, Design, Segment Tree
+  316:
+  - medium
+  - String, Stack, Greedy, Monotonic Stack
+  319:
+  - medium
+  - Math
+  322:
+  - medium
+  - Array, Dynamic Programming
+  323:
+  - medium
+  - Depth-First Search, Breadth-First Search, Union Find, Graph
+  329:
+  - hard
+  - Array, Dynamic Programming, Depth-First Search, Topological Sort, Matrix
+  332:
+  - hard
+  - Depth-First Search, Graph
+  338:
+  - easy
+  - Dynamic Programming, Bit Manipulation
+  339:
+  - medium
+  - Depth-First Search, Breadth-First Search
+  340:
+  - medium
+  - Hash Table, String, Sliding Window
+  344:
+  - easy
+  - Two Pointers, String
+  345:
+  - easy
+  - Two Pointers, String
+  347:
+  - medium
+  - Array, Hash Table, Sorting, Heap (Priority Queue)
+  354:
+  - hard
+  - Array, Binary Search, Dynamic Programming, Sorting
+  359:
+  - easy
+  - Hash Table, Design
+  361:
+  - medium
+  - Array, Dynamic Programming, Matrix
+  362:
+  - medium
+  - Array, Binary Search, Design, Queue
+  366:
+  - medium
+  - Tree, Depth-First Search
+  371:
+  - medium
+  - Math, Bit Manipulation
+  373:
+  - medium
+  - Array, Heap (Priority Queue)
+  374:
+  - easy
+  - Binary Search
+  375:
+  - medium
+  - Math, Dynamic Programming
+  377:
+  - medium
+  - Array, Dynamic Programming
+  378:
+  - medium
+  - Array, Binary Search, Sorting, Heap (Priority Queue), Matrix
+  380:
+  - medium
+  - Array, Hash Table, Math, Design
+  383:
+  - easy
+  - Hash Table, String, Counting
+  387:
+  - easy
+  - Hash Table, String, Queue, Counting
+  392:
+  - easy
+  - Two Pointers, String, Dynamic Programming
+  394:
+  - medium
+  - String, Stack, Recursion
+  397:
+  - medium
+  - Dynamic Programming, Greedy, Bit Manipulation
+  398:
+  - medium
+  - Hash Table, Math, Reservoir Sampling
+  404:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  409:
+  - easy
+  - Hash Table, String, Greedy
+  410:
+  - hard
+  - Array, Binary Search, Dynamic Programming, Greedy
+  415:
+  - easy
+  - Math, String
+  417:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Matrix
+  424:
+  - medium
+  - Hash Table, String, Sliding Window
+  429:
+  - medium
+  - Tree, Breadth-First Search
+  430:
+  - medium
+  - Linked List, Depth-First Search
+  435:
+  - medium
+  - Array, Dynamic Programming, Greedy, Sorting, Intervals
+  443:
+  - medium
+  - Two Pointers, String
+  452:
+  - medium
+  - Array, Greedy, Sorting, Intervals
+  459:
+  - easy
+  - String, String Matching
+  460:
+  - hard
+  - Hash Table, Linked List, Design
+  472:
+  - hard
+  - Array, String, Dynamic Programming, Depth-First Search, Trie
+  475:
+  - medium
+  - Array, Two Pointers, Binary Search, Sorting
+  485:
+  - easy
+  - Array
+  494:
+  - medium
+  - Array, Dynamic Programming, Backtracking
+  496:
+  - easy
+  - Array, Hash Table, Stack, Monotonic Stack
+  502:
+  - hard
+  - Array, Greedy, Sorting, Heap (Priority Queue)
+  507:
+  - easy
+  - Math
+  509:
+  - easy
+  - Math, Dynamic Programming, Recursion
+  518:
+  - medium
+  - Array, Dynamic Programming
+  528:
+  - medium
+  - Array, Math, Binary Search, Prefix Sum
+  529:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Matrix
+  530:
+  - easy
+  - Tree, Depth-First Search, Binary Search Tree
+  532:
+  - medium
+  - Array, Hash Table, Two Pointers, Sorting
+  538:
+  - medium
+  - Tree, Depth-First Search, Binary Search Tree
+  542:
+  - medium
+  - Array, Dynamic Programming, Breadth-First Search, Matrix
+  543:
+  - easy
+  - Tree, Depth-First Search
+  547:
+  - medium
+  - Depth-First Search, Breadth-First Search, Union Find, Graph
+  560:
+  - medium
+  - Array, Hash Table, Prefix Sum
+  561:
+  - easy
+  - Array, Greedy, Sorting
+  572:
+  - easy
+  - Tree, Depth-First Search
+  589:
+  - easy
+  - Stack, Tree, Depth-First Search
+  605:
+  - easy
+  - Array, Greedy
+  611:
+  - medium
+  - Array, Two Pointers, Binary Search, Greedy, Sorting
+  621:
+  - medium
+  - Array, Hash Table, Greedy, Sorting, Heap (Priority Queue)
+  637:
+  - easy
+  - Tree, Breadth-First Search
+  643:
+  - easy
+  - Array, Sliding Window
+  647:
+  - medium
+  - Two Pointers, String, Dynamic Programming
+  662:
+  - medium
+  - Tree, Depth-First Search, Breadth-First Search
+  670:
+  - medium
+  - Math, Greedy
+  673:
+  - medium
+  - Array, Dynamic Programming
+  680:
+  - easy
+  - Two Pointers, String, Greedy
+  683:
+  - hard
+  - Array, Sliding Window, Monotonic Queue
+  704:
+  - easy
+  - Array, Binary Search
+  713:
+  - medium
+  - Array, Sliding Window
+  721:
+  - medium
+  - Array, Hash Table, String, Depth-First Search, Union Find
+  724:
+  - easy
+  - Array, Prefix Sum
+  733:
+  - easy
+  - Array, Depth-First Search, Breadth-First Search, Matrix
+  738:
+  - medium
+  - Math, Greedy
+  739:
+  - medium
+  - Array, Stack, Monotonic Stack
+  740:
+  - medium
+  - Array, Hash Table, Dynamic Programming
+  743:
+  - medium
+  - Depth-First Search, Breadth-First Search, Graph, Heap (Priority Queue), Shortest
+    Path
+  751:
+  - medium
+  - String, Bit Manipulation
+  760:
+  - easy
+  - Array, Hash Table
+  763:
+  - medium
+  - Hash Table, Two Pointers, String, Greedy
+  765:
+  - hard
+  - Greedy, Depth-First Search, Breadth-First Search, Union Find, Graph
+  766:
+  - easy
+  - Array, Matrix
+  767:
+  - medium
+  - Hash Table, String, Greedy, Sorting, Heap (Priority Queue), Counting
+  791:
+  - medium
+  - Hash Table, String, Sorting
+  797:
+  - medium
+  - Backtracking, Depth-First Search, Breadth-First Search, Graph
+  799:
+  - medium
+  - Dynamic Programming
+  814:
+  - medium
+  - Tree, Depth-First Search
+  815:
+  - hard
+  - Array, Hash Table, Breadth-First Search
+  827:
+  - hard
+  - Array, Depth-First Search, Breadth-First Search, Union Find, Matrix
+  832:
+  - easy
+  - Array, Two Pointers, Matrix
+  863:
+  - medium
+  - Hash Table, Tree, Depth-First Search, Breadth-First Search
+  872:
+  - easy
+  - Tree, Depth-First Search
+  875:
+  - medium
+  - Array, Binary Search
+  876:
+  - easy
+  - Linked List, Two Pointers
+  889:
+  - medium
+  - Array, Hash Table, Divide and Conquer, Tree
+  904:
+  - medium
+  - Array, Hash Table, Sliding Window
+  909:
+  - medium
+  - Array, Breadth-First Search, Matrix
+  921:
+  - medium
+  - String, Stack, Greedy
+  929:
+  - easy
+  - Array, Hash Table, String
+  933:
+  - easy
+  - Design, Queue
+  934:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Matrix
+  938:
+  - easy
+  - Tree, Depth-First Search, Binary Search Tree
+  953:
+  - easy
+  - Array, Hash Table, String
+  958:
+  - medium
+  - Tree, Breadth-First Search
+  966:
+  - medium
+  - Array, Hash Table, String
+  973:
+  - medium
+  - Array, Math, Divide and Conquer, Sorting, Heap (Priority Queue)
+  981:
+  - medium
+  - Hash Table, String, Binary Search, Design
+  986:
+  - medium
+  - Array, Two Pointers, Intervals
+  993:
+  - easy
+  - Tree, Depth-First Search, Breadth-First Search
+  994:
+  - medium
+  - Array, Breadth-First Search, Matrix
+  1003:
+  - medium
+  - String, Stack
+  1004:
+  - medium
+  - Array, Binary Search, Sliding Window, Prefix Sum
+  1010:
+  - medium
+  - Array, Hash Table, Counting
+  1022:
+  - easy
+  - Tree, Depth-First Search
+  1029:
+  - medium
+  - Array, Greedy, Sorting
+  1047:
+  - easy
+  - String, Stack
+  1071:
+  - easy
+  - Math, String
+  1091:
+  - medium
+  - Array, Breadth-First Search, Matrix
+  1143:
+  - medium
+  - String, Dynamic Programming
+  1166:
+  - medium
+  - Hash Table, String, Design, Trie
+  1174:
+  - medium
+  - Database
+  1207:
+  - easy
+  - Array, Hash Table
+  1209:
+  - medium
+  - String, Stack
+  1235:
+  - hard
+  - Array, Binary Search, Dynamic Programming, Sorting, Intervals
+  1248:
+  - medium
+  - Array, Hash Table, Math, Sliding Window, Prefix Sum
+  1249:
+  - medium
+  - String, Stack
+  1287:
+  - easy
+  - Array
+  1292:
+  - medium
+  - Array, Binary Search, Matrix, Prefix Sum
+  1293:
+  - hard
+  - Array, Breadth-First Search, Matrix
+  1302:
+  - medium
+  - Tree, Depth-First Search, Breadth-First Search
+  1304:
+  - easy
+  - Array, Math
+  1319:
+  - medium
+  - Depth-First Search, Breadth-First Search, Union Find, Graph
+  1345:
+  - hard
+  - Array, Hash Table, Breadth-First Search
+  1349:
+  - hard
+  - Array, Dynamic Programming, Bit Manipulation, Matrix, Bitmask
+  1358:
+  - medium
+  - Hash Table, String, Sliding Window
+  1376:
+  - medium
+  - Tree, Depth-First Search, Breadth-First Search
+  1394:
+  - easy
+  - Array, Hash Table, Counting
+  1396:
+  - medium
+  - Hash Table, String, Design
+  1431:
+  - easy
+  - Array
+  1438:
+  - medium
+  - Array, Sliding Window, Heap (Priority Queue), Monotonic Queue
+  1461:
+  - medium
+  - Hash Table, String, Bit Manipulation, Rolling Hash
+  1541:
+  - medium
+  - String, Stack, Greedy
+  1583:
+  - medium
+  - Array, Simulation
+  1668:
+  - easy
+  - String, String Matching
+  1700:
+  - easy
+  - Array, Stack, Queue, Simulation
+  1757:
+  - easy
+  - Database
+  1768:
+  - easy
+  - Two Pointers, String
+  1778:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Graph, Interactive
+  1834:
+  - medium
+  - Array, Sorting, Heap (Priority Queue)
+  2016:
+  - easy
+  - Array
+  2035:
+  - hard
+  - Array, Two Pointers, Binary Search, Dynamic Programming, Bit Manipulation, Bitmask
+  2075:
+  - medium
+  - String, Simulation
+  2099:
+  - easy
+  - Array, Hash Table, Sorting, Heap (Priority Queue)
+  2115:
+  - medium
+  - Array, Hash Table, String, Graph, Topological Sort
+  2163:
+  - hard
+  - Array, Dynamic Programming, Heap (Priority Queue)
+  2170:
+  - medium
+  - Array, Hash Table, Greedy, Counting
+  2353:
+  - medium
+  - Hash Table, Design, Heap (Priority Queue), Ordered Set
+  2385:
+  - medium
+  - Hash Table, Tree, Depth-First Search, Breadth-First Search
+  2502:
+  - medium
+  - Array, Hash Table, Design, Simulation
+  2560:
+  - medium
+  - Array, Binary Search
+  2571:
+  - medium
+  - Dynamic Programming, Greedy, Bit Manipulation
+  2667:
+  - easy
+  - JavaScript
+  2874:
+  - medium
+  - Array
+  2957:
+  - medium
+  - String, Dynamic Programming, Greedy
+  3005:
+  - easy
+  - Array, Hash Table, Counting
+  3035:
+  - medium
+  - Hash Table, String, Greedy, Sorting, Counting
+  3392:
+  - easy
+  - Array
+  3394:
+  - medium
+  - Array, Sorting, Intervals
+  3408:
+  - medium
+  - Hash Table, Design, Heap (Priority Queue), Ordered Set
+  3423:
+  - easy
+  - Array
+  3434:
+  - medium
+  - Array, Hash Table, Dynamic Programming, Prefix Sum
+  3442:
+  - easy
+  - Hash Table, String, Counting
+  3481:
+  - medium
+  - Array, Hash Table, String, Depth-First Search, Breadth-First Search, Graph, Topological
+    Sort
+  3484:
+  - medium
+  - Array, Hash Table, String, Design, Matrix
+  3592:
+  - medium
+  - Array, Hash Table, Dynamic Programming
+  3619:
+  - medium
+  - Array, Depth-First Search, Breadth-First Search, Union Find, Matrix

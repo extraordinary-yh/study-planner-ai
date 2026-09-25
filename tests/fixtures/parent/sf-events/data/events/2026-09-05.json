@@ -1,0 +1,18 @@
+{
+ "date": "2026-09-05",
+ "meta": {"generated_at": "2026-09-05T09:00:00", "sources": [], "warnings": []},
+ "events": [
+  {"id": "luma_sf:meetup-0", "source": "luma_sf", "source_name": "Luma SF", "title": "Agents meetup", "url": "https://lu.ma/agents-meetup",
+   "starts_at": "2026-09-05T18:00:00-07:00", "ends_at": "2026-09-05T20:00:00-07:00", "date": "2026-09-05",
+   "time_label": "Sat Sep 5 · 6:00–8:00 PM", "venue": "Shack15", "address": "1 Ferry Building, San Francisco", "format": "meetup"},
+  {"id": "luma_sf:hack-1", "source": "luma_sf", "source_name": "Luma SF", "title": "Agents hackathon", "url": "https://lu.ma/agents-hack",
+   "starts_at": "2026-09-12T10:00:00-07:00", "ends_at": "2026-09-12T20:00:00-07:00", "date": "2026-09-12",
+   "time_label": "Sat Sep 12 · 10:00 AM–8:00 PM", "venue": "Frontier Tower", "address": "995 Market St, San Francisco", "format": "hackathon"},
+  {"id": "garysguide:x1", "source": "garysguide", "source_name": "Gary's Guide", "title": "Founders dinner", "url": "https://www.garysguide.com/events/x1",
+   "starts_at": "2026-09-12T00:00:00-07:00", "ends_at": null, "date": "2026-09-12",
+   "time_label": "Sat Sep 12", "venue": "TBA", "address": "", "format": "mixer"},
+  {"id": "luma_sf:skip-2", "source": "luma_sf", "source_name": "Luma SF", "title": "Skipped thing", "url": "https://lu.ma/skipped",
+   "starts_at": "2026-09-12T13:00:00-07:00", "ends_at": "2026-09-12T14:00:00-07:00", "date": "2026-09-12",
+   "time_label": "Sat Sep 12 · 1:00–2:00 PM", "venue": "", "address": "", "format": "other"}
+ ]
+}

@@ -1,0 +1,194 @@
+updated_on: '2026-01-01'
+source: Synthetic regression scenario
+coding:
+  implementation: 'Use your working Python approach. For binary search, low < high
+    is welcome: explain the invariant, shrinking interval, termination and edge cases.
+    No forced alternative template.'
+  priorities:
+  - topic: topological_sort
+    reason: Synthetic learner needs practice in topological_sort
+    source: Synthetic test fixture
+    resolved_on: null
+    problems:
+    - slug: course-schedule
+      title: Course Schedule
+      difficulty: medium
+      pattern: Topological sort / directed-cycle detection; Kahn BFS or DFS is acceptable
+    - slug: course-schedule-ii
+      title: Course Schedule II
+      difficulty: medium
+      pattern: Produce a topological ordering; transfer check after Course Schedule
+  - topic: tries
+    reason: Synthetic learner needs practice in tries
+    source: Synthetic test fixture
+    resolved_on: null
+    problems:
+    - slug: design-add-and-search-words-data-structure
+      title: Design Add and Search Words
+      difficulty: medium
+      pattern: Trie plus recursive wildcard lookup
+    - slug: implement-trie-prefix-tree
+      title: Implement Trie (Prefix Tree)
+      difficulty: medium
+      pattern: Trie insertion, exact lookup and prefix lookup
+design:
+  evidence: {}
+  concepts:
+  - id: http_api
+    title: HTTP request and response
+    section: HTTP request and response
+    task: Read the HTTP example and explain the request lifecycle with the lesson
+      open.
+    reason: Synthetic interview preparation scenario.
+  - id: qps
+    title: QPS and peak estimates
+    section: 'QPS: what it tells you'
+    task: Read the worked estimate, repeat the division with units, and distinguish
+      daily average, peak-window average and a burst assumption.
+    reason: Synthetic interview preparation scenario.
+  - id: availability
+    title: Availability, SLOs and disaster recovery
+    section: 'Availability: claim, design, and evaluation'
+    task: Read the availability section; explain SLI versus SLO, successful requests
+      versus downtime, and how failover and recovery drills address a regional outage.
+      Use the example as a guide.
+    reason: Synthetic interview preparation scenario.
+  - id: queue_rag
+    title: Queues, parsing, chunking and embeddings
+    section: What the ingestion path does
+    task: Read the ingestion section; follow one uploaded document through the queue,
+      worker, parser, chunks, Voyage embeddings and index. Explain why the upload
+      can finish before indexing.
+    reason: Synthetic interview preparation scenario.
+  - id: boundaries
+    title: Deployment, scaling and failure boundaries
+    section: The architecture
+    task: Read the boundaries section; annotate the existing diagram with the two
+      logical modules, background worker and external providers. Explain one scaling
+      and one failure boundary.
+    reason: Synthetic interview preparation scenario.
+  - id: ai_grounding
+    title: HTTP and grounded AI
+    section: 'Start here: HTTP meets grounded AI'
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the required HTTP introduction, then the worked offer-verification
+      example. Trace evidence, model output and product policy separately.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: With the example open, distinguish request/response, product identity,
+      evidence freshness, optional model and final decision.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_evals
+    title: AI evaluation and judge calibration
+    section: Evaluation before optimization
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the synthetic labeled-claim example. Work through precision, recall,
+      abstention, slices and held-out evaluation with the explanation visible.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Explain the metric denominators and one judge error; independent
+      evidence requires an unaided explanation.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_workers
+    title: Workers in AI serving and evaluation
+    section: Workers and the two paths
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the worker example and trace a duplicate delivery after a crash. Separate
+      pre-display checks from background evaluation.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Explain acceptance versus completion, one duplicate-safe write
+      and the stale-feed failure.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_cache
+    title: Caching AI evidence safely
+    section: Caching and freshness
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the cache example and choose a cached object, key, freshness rule and
+      fallback for the offer service.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Explain a stale-price bug, invalidation and behavior when the
+      cache is unavailable.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_visual
+    title: Shopping visual retrieval and generation
+    section: Shopping visual retrieval
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the shopping example and compare exact-product asset retrieval with
+      illustrative image generation.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Distinguish retrieval, ranking and generation; explain one metric
+      and text-only fallback.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_workflows
+    title: Model choice and bounded AI workflows
+    section: Model choice and bounded workflows
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the named Google LLM adaptation lesson and the application example;
+      compare rules, retrieval, prompting, fine-tuning and an agent.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Give one justified model/workflow choice, one tool boundary and
+      one stopping rule; diagnose unknown ML terms.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  - id: ai_serving
+    title: AI serving and rollout
+    section: Serving and rollout
+    resource: study-plan/docs/ai-system-design.md
+    task: Read the named Google monitoring sections and the example; trace a regression
+      from source data through model to user output.
+    reason: Synthetic interview preparation scenario.
+    stop_condition: Name a quality signal, latency signal, data/model version and
+      rollback condition.
+    track: ai_examples
+    practice: Reread the example and explain it mentally with the page open; identify
+      any remaining unfamiliar terms. No coding or typed write-up required
+  resource: study-plan/docs/example-classroom-system-design-foundations.md
+  deferred_probe: Gemini p95 rises to 5 seconds while the answer target is under 3
+    seconds.
+  release_rule: Teach AI cases with prerequisites in context. Gate each cold probe
+    only on its required concepts, supported by observed independent explanations;
+    do not require the entire generic ladder before AI learning.
+  priority_order:
+  - ai_grounding
+  - ai_evals
+  - ai_workers
+  - ai_cache
+  - ai_visual
+  - ai_workflows
+  - ai_serving
+planning:
+  focus_weights_final: true
+  activity_order: Computer work first, then reading.
+  completion_policy: Unlogged work is pending; never infer completion.
+  focus_weights:
+    news: 0
+    stack: 0
+    stories: 0
+    system_design: 0.4
+    leetcode: 0.6
+  max_design_minutes: 60
+  max_coding_minutes: 90
+  max_coding_problems: 2
+  short_day_minutes: 90
+  suppress_stories: true
+  block_order:
+  - debrief
+  - leetcode
+  - design
+  - stack
+  - news
+  - stories
+  - chores
+  daily_decision_rule: Coach reranks daily from confirmed next gate, observed gap,
+    transfer/unlock value, available device/energy and time cost. Record why the chosen
+    task beats its nearest alternative, exit evidence and next update trigger. Do
+    not infer mastery from reading or use numeric hiring probabilities.

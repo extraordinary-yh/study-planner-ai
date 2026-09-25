@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+<title>Hacker News: Newest</title>
+<item>
+  <title><![CDATA[OpenAI ships a new inference stack for agents]]></title>
+  <link>https://example.com/openai-inference</link>
+  <pubDate>Sat, 06 Sep 2026 10:15:00 +0000</pubDate>
+  <description><![CDATA[<p>Article URL: <a href="https://example.com/openai-inference">link</a></p> Benchmark results inside.]]></description>
+  <guid isPermaLink="false">https://news.ycombinator.com/item?id=1</guid>
+</item>
+<item>
+  <title>Show HN: A Postgres rate limit extension</title>
+  <link>https://example.com/pg-rate-limit</link>
+  <pubDate>Sat, 06 Sep 2026 09:00:00 +0000</pubDate>
+  <description>Token bucket in SQL.</description>
+</item>
+<item>
+  <title>Notes on building MCP servers for coding agents</title>
+  <link>https://simonwillison.net/2026/Sep/6/mcp-agents/</link>
+  <pubDate>Sat, 06 Sep 2026 09:30:00 +0000</pubDate>
+  <description>duplicate of the atom entry</description>
+</item>
+</channel>
+</rss>

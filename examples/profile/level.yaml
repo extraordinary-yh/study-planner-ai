@@ -1,0 +1,49 @@
+assessed_on: null
+goals:
+  target_start: null
+  interview_dates: []
+  target_roles: []
+  companies_in_mind: []
+constraints:
+  weekday_minutes: null
+  weekend_minutes: null
+  best_time: null
+  device: null
+coding:
+  overall: null
+  language: null
+  last_practiced: null
+  medium_minutes_typical: null
+  topics:
+    arrays_hashing: null
+    two_pointers_sliding_window: null
+    binary_search: null
+    stack_monotonic: null
+    linked_list: null
+    trees_bfs_dfs: null
+    heaps: null
+    graphs_topo_union_find: null
+    dynamic_programming: null
+    backtracking: null
+    intervals_greedy: null
+    tries: null
+    bit_manipulation: null
+system_design:
+  overall: null
+  interviews_done: null
+  topics:
+    estimation: null
+    load_balancing_scaling: null
+    caching: null
+    databases_sharding_replication: null
+    consistency_transactions: null
+    queues_async: null
+    realtime_sse_websockets: null
+    rate_limiting: null
+    reliability_retries_breakers: null
+    llm_system_patterns: null
+  read_ddia: null
+stack: {}
+behavioral:
+  stories_rehearsed: null
+  weakest_question_types: []

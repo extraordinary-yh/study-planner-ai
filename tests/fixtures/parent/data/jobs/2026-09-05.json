@@ -1,0 +1,16 @@
+{"date": "2026-09-05", "meta": {"generated_at": "2026-09-05T14:00:00"}, "jobs": [
+ {"id": "mercor:1", "company": "Mercor", "title": "Software Engineer, Agents", "score": 91, "excluded": false, "hidden": false,
+  "description_text": "Backend: Python, FastAPI, Django. Frontend: Next.js, React, TypeScript. Data: PostgreSQL, Redis. Orchestration: Kubernetes, Temporal. Agents/LLM: LangGraph, FastMCP. Build RL environments and evals for agents that automate operational work.",
+  "qualifications_min": "", "qualifications_pref": "", "responsibilities": ""},
+ {"id": "stripe:2", "company": "Stripe", "title": "Software Engineer, New Grad", "score": 80, "excluded": false, "hidden": false,
+  "description_text": "We use Ruby, Java, Go and Scala. Experience with Kafka and distributed systems is a plus. Familiarity with JavaScript, Python or Go.",
+  "qualifications_min": "", "qualifications_pref": "", "responsibilities": ""},
+ {"id": "google:3", "company": "Google", "title": "Software Engineer II", "score": 78, "excluded": false, "hidden": false,
+  "description_text": "Experience in one or more general purpose programming languages including but not limited to: Java, C/C++, C#, Objective C, Python, JavaScript, or Go. Distributed systems, security.",
+  "qualifications_min": "", "qualifications_pref": "", "responsibilities": ""},
+ {"id": "apple:4", "company": "Apple", "title": "Backend Engineer", "score": 60, "excluded": false, "hidden": false,
+  "description_text": "Java microservices, Kafka, Cassandra, Kubernetes. Go to market with our partners.",
+  "qualifications_min": "", "qualifications_pref": "", "responsibilities": ""},
+ {"id": "acme:5", "company": "Acme", "title": "Staff Engineer", "score": 88, "excluded": true, "hidden": false, "exclude_reason": "level",
+  "description_text": "Rust and Kafka everywhere.", "qualifications_min": "", "qualifications_pref": "", "responsibilities": ""}
+]}

@@ -1,0 +1,57 @@
+# the user's assessed level. The agent fills this from the assessment interview (profile/assessment.md) and updates it
+# when the LeetCode log or the daily log contradicts a rating. `null` means not yet asked.
+assessed_on: null                # ISO date of the last full assessment; sections older than 30 days get re-asked
+
+goals:
+  target_start: null             # when a new job should start (ISO date or "asap")
+  interview_dates: []            # [{company: "", stage: "phone", date: "2026-09-20"}] beyond what feedback.jsonl knows
+  target_roles: []               # e.g. ["AI product engineer", "founding engineer"]
+  companies_in_mind: []          # e.g. ["Anthropic", "Mercor"]
+
+constraints:
+  weekday_minutes: null          # overrides preferences.daily_minutes when set
+  weekend_minutes: null
+  best_time: null                # "morning" / "evening" / "split"
+  device: null                   # "laptop" / "phone" / "both"
+
+coding:                          # 1–5 (1 = never done it, 5 = fluent under interview pressure)
+  overall: null
+  language: null                 # interview language: "python" / "typescript" / ...
+  last_practiced: null           # ISO date of the last problem before this tool
+  medium_minutes_typical: null   # how long a fresh LeetCode medium usually takes
+  topics:
+    arrays_hashing: null
+    two_pointers_sliding_window: null
+    binary_search: null
+    stack_monotonic: null
+    linked_list: null
+    trees_bfs_dfs: null
+    heaps: null
+    graphs_topo_union_find: null
+    dynamic_programming: null
+    backtracking: null
+    intervals_greedy: null
+    tries: null
+    bit_manipulation: null
+
+system_design:                   # 1–5
+  overall: null
+  interviews_done: null          # count of real system-design interviews so far
+  topics:
+    estimation: null
+    load_balancing_scaling: null
+    caching: null
+    databases_sharding_replication: null
+    consistency_transactions: null
+    queues_async: null
+    realtime_sse_websockets: null
+    rate_limiting: null
+    reliability_retries_breakers: null
+    llm_system_patterns: null
+  read_ddia: null                # "no" / "some" / "yes"
+
+stack: {}                        # overrides for config/stack_terms.yaml depths, e.g. {Go: familiar, Kafka: none}
+
+behavioral:
+  stories_rehearsed: null        # 1–5
+  weakest_question_types: []     # from ../profile/context/98-interview-map.md behavioral table

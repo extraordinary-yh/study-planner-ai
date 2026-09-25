@@ -1,0 +1,22 @@
+# Local identity, career data, credentials, and outputs never belong in the public template.
+.env
+.env.*
+!.env.example
+/profile/
+/data/
+/plans/
+/reports/
+/build/
+/site/
+/integrations/
+/Applied Job Resumes/
+/config/remnote.yaml
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+dist/
+.DS_Store
+*.pem
+*.key
