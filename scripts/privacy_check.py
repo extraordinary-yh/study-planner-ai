@@ -8,8 +8,8 @@ import subprocess
 import sys
 
 root = Path(__file__).resolve().parents[1]
-files = subprocess.check_output(["git", "ls-files", "-z"], cwd=root).decode().split("\0")
-private = {"profile", "data", "plans", "reports", "build", "site", "integrations", "Applied Job Resumes", ".venv", "node_modules"}
+files = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=root).decode().split("\0")
+private = {"profile", "data", "plans", "reports", "build", "site", "integrations", "Applied Job Resumes", ".venv", "node_modules", "sessions", "coaching"}
 patterns = [
     ("private key", re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----")),
     ("GitHub token", re.compile(rb"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{40,})")),
@@ -22,9 +22,12 @@ for name in filter(None,files):
     if p.parts[0] in private or (p.name.startswith(".env") and p.name != ".env.example"):
         failures.append((name,"private workspace file"))
     path=root/name
+    if path.is_symlink():
+        failures.append((name,"symlink in public payload"))
+        continue
     if not path.is_file(): continue
     for label,pattern in patterns:
         if pattern.search(path.read_bytes()): failures.append((name,label))
 for name,reason in failures: print(f"FAIL {name}: {reason}")
-print(f"Privacy check: {len([f for f in files if f])} tracked paths, {len(failures)} finding(s).")
+print(f"Privacy check: {len([f for f in files if f])} tracked or unignored paths, {len(failures)} finding(s).")
 sys.exit(bool(failures))
