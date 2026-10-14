@@ -9,14 +9,16 @@
     month/<YYYY-MM>.html       one cell per day: minutes, dots for interviews / events, a tint for planned days
     week/<YYYY-Www>.html       seven time-axis columns: events as busy blocks, interviews fixed, study blocks
     day/<date>.html            the M1 board rendered statically (hub mode) + Job list, Artifacts, Debrief panels
-    files/<repo path>.html     the markdown, curriculum entries and LeetCode rows an item's `refs` point at,
+    files/<repo path>.html     documents reached from actions, refs, curriculum entries and LeetCode rows,
                                copied into the site as HTML so a link works offline once the page is decrypted
 
 Standard library only, vanilla JS, no CDN: `jobradar publish` encrypts every page for GitHub Pages, and the
-decrypted page must work with no network. Repo paths that cannot be copied (folders, PDFs) link to GitHub.
+decrypted page must work with no network. Unsupported repo paths (such as folders) link to GitHub.
 """
 from __future__ import annotations
 
+import base64
+import mimetypes
 import datetime as dt
 import html
 import json
@@ -24,6 +26,7 @@ import re
 import posixpath
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlsplit
 
 import yaml
 
@@ -35,6 +38,7 @@ from .jobs import INTERVIEW_STAGES
 from .leetcode import load_attempts
 from .plan import load_plan, to_minutes
 from .sfdata import marked, went_yesterday
+from .resources import canonical_ref, resource_path, plan_resources, TEXT_SUFFIXES, BINARY_SUFFIXES
 
 GITHUB_API = "https://api.github.com"
 REPORT_BASE = "../../archive"          # where `jobradar publish` puts the day's job report next to /hub/ on the site
@@ -219,7 +223,7 @@ def build_index(root: Path, parent: Path, today: str) -> dict[str, Any]:
             "plan": None if payload is None else {
                 "call": payload["call"], "minutes": payload["minutes"], "arranged": payload.get("arranged", False),
                 "blocks": [{"id": b["id"], "title": b["title"], "start": b["start"], "end": b["end"], "minutes": b["minutes"],
-                            "done": b["done"], "items": [{"id": i["id"], "text": i["text"], "done": i["done"], "refs": i.get("refs", [])}
+                            "done": b["done"], "items": [{"id": i["id"], "text": i["text"], "done": i["done"], "refs": i.get("refs", []), "decisions": i.get("decisions", []), "first_action": i.get("first_action", ""), "action_url": i.get("action_url", "")}
                                                           for i in b["items"]]} for b in payload["blocks"]],
                 "events": [{"id": e["id"], "title": e["title"], "start": e["start"], "end": e["end"], "minutes": e["minutes"],
                             "all_day": e["all_day"], "busy": e["busy"], "source": e["source"], "url": e["url"]} for e in payload["events"]],
@@ -382,6 +386,8 @@ def ref_kind(ref: str) -> str:
         return "curriculum"
     if path == "study-plan/data/leetcode.jsonl":
         return "leetcode"
+    if Path(path).suffix.lower() in TEXT_SUFFIXES | BINARY_SUFFIXES | {".html", ".htm"}:
+        return "document"
     return "github"
 
 
@@ -402,11 +408,41 @@ def _resolve(ref: str, root: Path, parent: Path) -> Path:
     return (root / path[len("study-plan/"):]) if path.startswith("study-plan/") else (parent / path)
 
 
-def render_file_page(ref: str, root: Path, parent: Path) -> str | None:
+def document_ref(raw: str, source: str) -> str:
+    if re.match(r"^(?:https?:|mailto:|data:|#)", raw):
+        return raw
+    if raw.startswith("/") or re.match(r"^[a-z]+:", raw, re.I):
+        return ""
+    return canonical_ref(posixpath.normpath(posixpath.join(posixpath.dirname(source), raw.partition("#")[0]))
+                         + ("#" + raw.partition("#")[2] if "#" in raw else ""))
+
+
+def rewrite_document_links(body: str, source: str, *, live: bool) -> str:
+    def replace(m):
+        raw = html.unescape(m[2])
+        parsed = urlsplit(raw)
+        if not live and parsed.hostname in ('127.0.0.1', 'localhost') and parsed.port == 8765 and parsed.path == '/':
+            date = (parse_qs(parsed.query).get('date') or [''])[0]
+            if re.fullmatch(r'\d{4}-\d{2}-\d{2}', date):
+                target = '../' * (1 + source.count('/')) + 'day/' + date + '.html'
+                return m[1] + '="' + esc(target + ('#' + parsed.fragment if parsed.fragment else '')) + '"'
+        if re.match(r"^(?:https?:|mailto:|data:|#)", raw):
+            return m[0]
+        ref = document_ref(raw, source)
+        if not ref:
+            return m[1] + '="#"'
+        target = "/files/" + ref if live else ref_link(ref, depth=1 + source.count("/"))
+        return m[1] + '="' + esc(target) + '"'
+    return re.sub(r'(href|src)="([^"<>]+)"', replace, body)
+
+
+def render_file_page(ref: str, root: Path, parent: Path, *, live: bool = False) -> str | None:
     """The HTML body for a copied repo file, or None when the file is missing."""
     kind = ref_kind(ref)
     path = ref.partition("#")[0]
-    src = _resolve(ref, root, parent)
+    src = resource_path(ref, root, parent)
+    if src is None:
+        return None
     if kind == "md":
         if not src.exists():
             return None
@@ -418,7 +454,7 @@ def render_file_page(ref: str, root: Path, parent: Path) -> str | None:
             for lesson in m.get("lessons", []):
                 parts.append(f'<h3 id="{esc(lesson["id"])}">{esc(lesson["id"])} · {esc(lesson["title"])} · {int(lesson.get("minutes", 45))} min</h3>'
                              f'<p><b>Read:</b> {inline_md(str(lesson.get("read", "")))}</p><p><b>Do:</b> {inline_md(str(lesson.get("do", "")))}</p>'
-                             + (f'<p><b>Own system:</b> <a href="../../profile/context/{esc(lesson["own_system"])}.md.html">profile/context/{esc(lesson["own_system"])}.md</a></p>'
+                             + (f'<p><b>Own system:</b> <a href="../../profile/context/{esc(lesson["own_system"])}.md">profile/context/{esc(lesson["own_system"])}.md</a></p>'
                                 if lesson.get("own_system") else ""))
         body = "\n".join(parts)
     elif kind == "leetcode":
@@ -434,13 +470,39 @@ def render_file_page(ref: str, root: Path, parent: Path) -> str | None:
                          + "".join(f"<tr><td>{esc(r['date'])}</td><td>{esc(r['outcome'])}</td><td>{r.get('minutes') or ''}</td><td>{esc(r.get('notes') or '')}</td></tr>" for r in rows)
                          + "</tbody></table>")
         body = "\n".join(parts) or "<p>No attempts on file.</p>"
+    elif kind == "document":
+        suffix = src.suffix.lower()
+        if suffix in {".html", ".htm"}:
+            # Opaque-origin frame: a lesson script cannot read hub tokens or write to the board.
+            document = src.read_text()
+            document = rewrite_document_links(document, path, live=live)
+            policy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: https:; connect-src 'none'; form-action 'none'"
+            document = '<meta http-equiv="Content-Security-Policy" content="' + esc(policy) + '">' + document
+            document += '''<script>addEventListener('message', e => {
+              if(e.source !== parent || typeof e.data.studyAnchor !== 'string') return;
+              const target = document.getElementById(e.data.studyAnchor); if(target) target.scrollIntoView();
+            });</script>'''
+            body = '<iframe id="document-frame" title="Study document" sandbox="allow-scripts allow-popups" style="width:100%;height:80vh;border:0" srcdoc="' + esc(document) + '"></iframe>'
+            body += '''<script>const frame = document.getElementById('document-frame');
+              function goToSection(){let anchor;try{anchor=decodeURIComponent(location.hash.slice(1));}catch{return;}
+                frame.contentWindow.postMessage({studyAnchor:anchor}, '*');}
+              frame.addEventListener('load', goToSection); addEventListener('hashchange', goToSection);</script>'''
+        elif suffix in BINARY_SUFFIXES:
+            mime = mimetypes.guess_type(src.name)[0] or 'application/octet-stream'
+            data = 'data:' + mime + ';base64,' + base64.b64encode(src.read_bytes()).decode()
+            body = ('<iframe title="PDF document" style="width:100%;height:80vh" src="' + data + '"></iframe>' if suffix == '.pdf'
+                    else '<img alt="' + esc(src.name) + '" style="max-width:100%" src="' + data + '">')
+        else:
+            body = '<pre style="white-space:pre-wrap;overflow-wrap:anywhere"><code>' + esc(src.read_text()) + '</code></pre>'
     else:
         return None
+    if kind != "document" or src.suffix.lower() not in {".html", ".htm"}:
+        body = rewrite_document_links(body, path, live=live)
     mermaid = ('<script type="module">import mermaid from '
                '"https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"; '
                'mermaid.initialize({startOnLoad:true, securityLevel:"strict"});</script>'
                if 'class="mermaid"' in body else "")
-    return page(f"{path}", f'<p class="crumb"><a href="../../index.html">hub</a> · <code>{esc(path)}</code> · '
+    return page(f"{path}", f'<p class="crumb"><a href="{"/" if live else "../" * (1 + path.count("/")) + "index.html"}">hub</a> · <code>{esc(path)}</code> · '
                 f'<a href="{GITHUB_REPO}/blob/main/{esc(path)}" target="_blank" rel="noopener">on GitHub</a></p>'
                 f'<article class="doc">{body}</article>{mermaid}', depth=2 + path.count("/"))
 
@@ -686,18 +748,6 @@ def render_day(entry: dict[str, Any], index: dict[str, Any], root: Path, parent:
     panels = panels_html(entry, files=files, report_base=report_base, debrief_form=debrief_form)
     if entry["plan"] is not None:
         payload = plan_payload(root, d)
-        def hosted_url(url: str) -> str:
-            path, sep, anchor = url.partition("#")
-            if path.startswith(("./", "../")):
-                path = posixpath.normpath(posixpath.join("study-plan", path))
-            target = files.get(path)
-            return target + (sep + anchor if sep else "") if target else url
-
-        for block in payload.get("blocks", []):
-            block["first_action"] = re.sub(r"(?<=\()([^()\s]+)(?=\))",
-                                           lambda m: hosted_url(m[0]), block.get("first_action", ""))
-            for link in block.get("links", []):
-                link["url"] = hosted_url(link["url"])
         days = list(index["days"])
         before = [x for x in days if x < d]
         after = [x for x in days if x > d]
@@ -756,6 +806,31 @@ def build_site(root: Path, parent: Path, out: Path, today: str, *, report_base: 
             for b in e["plan"]["blocks"]:
                 for i in b["items"]:
                     refs.update(i.get("refs", []))
+    for date in days:
+        plan = load_plan(root, date)
+        if plan:
+            refs.update(plan_resources(plan))
+            from .session import load_lessons
+            for lesson in load_lessons(root, date).get('steps', {}).values():
+                refs.update(canonical_ref(r['url']) for r in lesson.get('resources', []))
+    # Copy documents reached from required resources too, so nested reading links work offline.
+    pending = list(refs)
+    inspected = set()
+    while pending:
+        ref = pending.pop()
+        path = ref.partition("#")[0]
+        if path in inspected:
+            continue
+        inspected.add(path)
+        src = resource_path(ref, root, parent)
+        if src is None or src.suffix.lower() not in {'.md', '.html', '.htm'}:
+            continue
+        raw = src.read_text()
+        links = re.findall(r'\]\(([^)\s]+)\)', raw) + re.findall(r'(?:href|src)=["\']([^"\']+)["\']', raw)
+        for link in links:
+            target = document_ref(link, path)
+            if target and resource_path(target, root, parent) is not None and target not in refs:
+                refs.add(target); pending.append(target)
     files: dict[str, str] = {}
     copied = 0
     rendered_paths: set[str] = set()
@@ -776,6 +851,7 @@ def build_site(root: Path, parent: Path, out: Path, today: str, *, report_base: 
             rendered_paths.add(path)
             copied += 1
         files[ref] = ref_link(ref)
+        files.setdefault(path, ref_link(path))
 
     since, until = dt.date.fromisoformat(index["since"]), dt.date.fromisoformat(index["until"])
     months = sorted({d.strftime("%Y-%m") for d in (since + dt.timedelta(days=i) for i in range((until - since).days + 1))})
@@ -787,6 +863,18 @@ def build_site(root: Path, parent: Path, out: Path, today: str, *, report_base: 
     for d, e in days.items():
         (out / "day" / f"{d}.html").write_text(render_day(e, index, root, parent, files=files, report_base=report_base,
                                                           events_base=events_base, debrief_form=debrief_form, write=write_cfg))
+        from .session import load_lessons, session_payload, render_session
+        lessons = load_lessons(root, d)
+        if lessons and e['plan']:
+            folder = out / 'sessions' / d
+            folder.mkdir(parents=True, exist_ok=True)
+            for block in e['plan']['blocks']:
+                for item in block['items']:
+                    if item['id'] in lessons.get('steps', {}):
+                        if not re.fullmatch(r'[A-Za-z0-9_-]+', item['id']):
+                            raise ValueError('Unsafe session item id')
+                        payload = session_payload(root, d, block['id'], item['id'], live=False)
+                        (folder / (item['id'] + '.html')).write_text(render_session(payload))
     current = week_id(dt.date.fromisoformat(today))
     (out / "index.html").write_text(INDEX_HTML.replace("__WEEKS__", json.dumps(weeks)).replace("__LATEST__", current if current in weeks else weeks[-1]))
     return {"out": str(out), "days": len(days), "months": len(months), "weeks": len(weeks), "files": copied,

@@ -89,3 +89,18 @@ assert.ok(Buffer.from(calls[1].body.content, "base64").toString("utf8").includes
 assert.equal(HubWriter.b64ToUtf8(HubWriter.utf8ToB64("héllo ✓")), "héllo ✓");
 
 console.log("hubwrite: ok");
+
+// Decisions survive conflict retries, retain original content, and never write completion rows.
+const pp = "study-plan/plans/2026-09-07.json";
+const originalPlan = JSON.parse(files[pp].text);
+originalPlan.blocks[0].items = [{id: "design-1", text: "original", done: false}];
+files[pp].text = JSON.stringify(originalPlan);
+const logBeforeDecision = files["study-plan/data/log.jsonl"].text;
+putFailures = 1;
+await w.itemDecision({date: "2026-09-07", block: "design", item: "design-1", state: "not_applicable", reason: "lower priority"});
+await w.itemDecision({date: "2026-09-07", block: "design", item: "design-1", state: "applicable", reason: "reconsidered"});
+const decidedItem = JSON.parse(files[pp].text).blocks[0].items[0];
+assert.equal(decidedItem.text, "original");
+assert.equal(decidedItem.done, false);
+assert.equal(decidedItem.decisions.length, 2);
+assert.equal(files["study-plan/data/log.jsonl"].text, logBeforeDecision);

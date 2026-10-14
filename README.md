@@ -18,6 +18,8 @@
 - Schedule reviews from actual attempts and preserve overdue work that will not fit.
 - Let your coding agent assess gaps, teach a concept, and check an explanation.
 - Work from a local timeline with checklists, timers, and optional calendar context.
+- Resume a focused question with saved coaching checkpoints and an optional persistent timer.
+- Follow direct per-step resources and preserve reversible skip decisions.
 
 ## Try the fictional demo
 
@@ -33,6 +35,8 @@ uv run python scripts/demo.py --serve
 The demo runs locally with synthetic data and needs no API key. It writes to `build/demo/`; it never replaces your profile or records.
 
 ![Fictional demo screenshot](docs/assets/demo.png)
+
+![Fictional focused study step](docs/assets/focus.png)
 
 ## Make it yours
 
@@ -50,7 +54,7 @@ uv run studyplan plan --minutes 90 --no-news
 uv run studyplan serve
 ```
 
-The demo is a complete fictional practice day. `studyplan plan` generates a skeleton; your agent curates the exercises and runs `studyplan plan check` before treating it as ready. News feeds start disabled. The local board stays on `127.0.0.1`.
+The demo is a complete fictional practice day. Its focused learner view is available at `/study` on the local board; see [session setup](docs/study-sessions.md). `studyplan plan` generates a skeleton; your agent curates the exercises and runs `studyplan plan check` before treating it as ready. News feeds start disabled. The local board stays on `127.0.0.1`.
 
 Optionally point `JOBRADAR_ROOT` at a local Job Radar AI checkout to use its job snapshots and application stages. Without it, the planner starts independently with no job history. See [integrations](docs/integrations.md).
 

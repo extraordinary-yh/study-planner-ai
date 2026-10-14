@@ -42,7 +42,15 @@ class Item:
     id: str
     text: str
     done: bool = False
-    refs: list[str] = field(default_factory=list)   # artifacts behind the item: repo paths (from the repo root) or URLs
+    refs: list[str] = field(default_factory=list)
+    decisions: list[dict] = field(default_factory=list)
+    first_action: str = ""
+    action_url: str = ""
+
+    @property
+    def not_applicable(self) -> bool:
+        return bool(self.decisions and self.decisions[-1]["state"] == "not_applicable")
+
 
 
 @dataclass
@@ -64,8 +72,14 @@ class Block:
         out = list(self.description)
         if self.first_action:
             out.append(f"**First action (2 min):** {self.first_action}")
-        out.extend(f"- [{'x' if i.done else ' '}] {i.text}" + (f" <!--refs:{'|'.join(i.refs)}-->" if i.refs else "")
-                   for i in self.items)
+        for i in self.items:
+            out.append(f"- [{'x' if i.done else ' '}] {i.text}" + (f" <!--refs:{'|'.join(i.refs)}-->" if i.refs else ""))
+            if i.first_action or i.action_url:
+                out.append("<!--action:" + json.dumps({"first_action": i.first_action, "action_url": i.action_url}, ensure_ascii=True) + "-->")
+            if i.decisions:
+                out.append("<!--decisions:" + json.dumps(i.decisions, ensure_ascii=True) + "-->")
+                if i.not_applicable:
+                    out.append("<!--decision-label--> **暂不做 / N/A:** " + i.decisions[-1]["reason"].replace("\n", " "))
         if self.links:
             out.append("Open: " + " · ".join(f"[{l['label']}]({l['url']})" for l in self.links))
         if self.log_hint:
@@ -169,7 +183,10 @@ def quality_issues(plan: Plan) -> list[str]:
             issues.append(f"{label}: add at least one concrete task")
             continue
         item_minutes = 0
+        explicit_actions = any(i.first_action or i.action_url for i in block.items)
         for item in block.items:
+            if explicit_actions and (not item.first_action or not item.action_url):
+                issues.append(f"{item.id}: give every subtask an action label and action_url")
             matches = _TIMEBOX.findall(item.text)
             if not matches:
                 issues.append(f"{label}: time-box '{item.text}'")
@@ -603,7 +620,7 @@ def to_dict(plan: Plan) -> dict[str, Any]:
         "blocks": [{"id": b.id, "title": b.title, "start": b.start, "minutes": b.minutes, "done": b.done,
                     "first_action": b.first_action, "description": list(b.description),
                     "links": [dict(l) for l in b.links],
-                    "items": [{"id": i.id, "text": i.text, "done": i.done, "refs": list(i.refs)} for i in b.items],
+                    "items": [{"id": i.id, "text": i.text, "done": i.done, "refs": list(i.refs), "decisions": list(i.decisions), "first_action": i.first_action, "action_url": i.action_url} for i in b.items],
                     "log_hint": b.log_hint} for b in plan.blocks],
         "events": [{"id": e.id, "title": e.title, "start": e.start, "minutes": e.minutes, "calendar": e.calendar,
                     "url": e.url, "location": e.location, "all_day": e.all_day, "busy": e.busy,
@@ -618,7 +635,7 @@ def from_dict(data: dict[str, Any]) -> Plan:
     for b in data.get("blocks") or []:
         block = Block(str(b["id"]), str(b.get("title", "")), int(b.get("minutes", 0)), str(b.get("start", "")),
                       str(b.get("first_action", "")), list(b.get("description") or []),
-                      [Item(str(i["id"]), str(i["text"]), bool(i.get("done")), [str(r) for r in (i.get("refs") or [])])
+                      [Item(str(i["id"]), str(i["text"]), bool(i.get("done")), [str(r) for r in (i.get("refs") or [])], list(i.get("decisions") or []), str(i.get("first_action") or ""), str(i.get("action_url") or ""))
                        for i in (b.get("items") or [])],
                       [{"label": str(l["label"]), "url": str(l["url"])} for l in (b.get("links") or [])],
                       str(b.get("log_hint", "")), bool(b.get("done")))
@@ -710,6 +727,14 @@ def parse_md(text: str) -> Plan:
             if item:
                 b.add_item(item.group("text"), item.group("done") == "x",
                            [r for r in (item.group("refs") or "").split("|") if r])
+            elif not in_fence and line.startswith("<!--action:") and b.items:
+                action = json.loads(line[len("<!--action:"):-3])
+                b.items[-1].first_action = action.get("first_action", "")
+                b.items[-1].action_url = action.get("action_url", "")
+            elif not in_fence and line.startswith("<!--decisions:") and b.items:
+                b.items[-1].decisions = json.loads(line[len("<!--decisions:"):-3])
+            elif not in_fence and line.startswith("<!--decision-label-->"):
+                pass
             elif not in_fence and line.startswith("**First action (2 min):** "):
                 b.first_action = line[len("**First action (2 min):** "):]
             elif not in_fence and line.startswith("Open: "):

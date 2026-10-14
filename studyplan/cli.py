@@ -391,7 +391,9 @@ def cmd_plan_check(args) -> int:
     if plan is None:
         print(f"no plan for {today}: run `uv run studyplan --date {today} plan` first")
         return 1
-    issues = quality_issues(plan)
+    from .resources import resource_issues
+    from .session import session_issues
+    issues = quality_issues(plan) + resource_issues(plan, root, parent_root(root)) + session_issues(plan, root, parent_root(root))
     if issues:
         print(f"Plan clarity check: FAIL ({len(issues)} issue(s))")
         for issue in issues:
@@ -452,6 +454,24 @@ def cmd_remnote(args) -> int:
     print(f"wrote {len(records)} note-only problems to {output}; {mapped} have RemNote document ids, "
           f"{covered} appear in imported history")
     return 0
+
+
+def cmd_session(args) -> int:
+    from .board import BoardError
+    from .session import api_session, session_payload
+    try:
+        if args.session_action in ('show', 'prompt'):
+            result = session_payload(repo_root(), _today(args), args.block or '', args.item or '')
+        else:
+            result = api_session(repo_root(), {'date': _today(args), 'action': args.session_action,
+                                  'block': args.block, 'item': args.item, 'text': args.text,
+                                  'assistance': args.assistance})
+        print(result.get('handoff', 'All study steps are resolved.') if args.session_action == 'prompt'
+              else json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    except (BoardError, ValueError) as error:
+        print(str(error), file=sys.stderr)
+        return 1
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -568,6 +588,14 @@ def build_parser() -> argparse.ArgumentParser:
     hbb.add_argument("--events-base", dest="events_base", default="../../events",
                      help="where the day's event report lives relative to day/ pages (default: the published site's events/)")
     hb.set_defaults(func=cmd_hub)
+
+    session = sub.add_parser('session', help='resume coaching and update the focused study side page')
+    session.add_argument('session_action', choices=['show', 'prompt', 'start', 'pause', 'reset_timer', 'question', 'checkpoint', 'complete', 'undo', 'skip'])
+    session.add_argument('--block')
+    session.add_argument('--item')
+    session.add_argument('--text', default='')
+    session.add_argument('--assistance', choices=['unrecorded', 'guided', 'independent'], default='unrecorded')
+    session.set_defaults(func=cmd_session)
 
     sv = sub.add_parser("serve", help="open the day board at http://127.0.0.1:8765/ (loopback only)")
     sv.add_argument("--port", type=int, default=8765)
