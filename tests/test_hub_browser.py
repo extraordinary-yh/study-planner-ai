@@ -25,6 +25,43 @@ HERE = Path(__file__).resolve().parent
 DOCS = HERE.parents[0] / "build" / "test-artifacts"
 
 
+def test_hosted_action_only_resources_and_advance(roots, browser):
+    from test_action_resources import action_plan
+    root, parent = roots
+    plan = action_plan(root)
+    save_plan(root, plan)
+    github = FakeGitHub({'study-plan/data/log.jsonl': '',
+                         'study-plan/plans/2026-10-13.json': (root / 'plans/2026-10-13.json').read_text()})
+    out = root / 'site/hub'
+    try:
+        build_site(root, parent, out, plan.date, api=github.url)
+        page = browser.new_page()
+        page.goto((out / 'day/2026-10-13.html').as_uri() + '#case')
+        assert page.get_attribute('#first', 'href') == '../files/study-plan/docs/first.md.html#first-step'
+        with page.expect_popup() as opened:
+            page.click('#first')
+        opened.value.wait_for_load_state()
+        assert opened.value.locator('#first-step').inner_text() == 'First step'
+        opened.value.close()
+        page.evaluate("localStorage.setItem('hub.token', 'github_pat_TEST')")
+        page.check('#it-case-1')
+        page.wait_for_function("document.querySelector('#first').dataset.item === 'case-2'")
+        assert page.get_attribute('#first', 'href') == '../files/study-plan/docs/second.html.html'
+        with page.expect_popup() as opened:
+            page.click('#first')
+        doc = opened.value
+        doc.wait_for_load_state()
+        doc.frame_locator('iframe').get_by_role('button', name='Try', exact=True).click()
+        assert doc.frame_locator('iframe').get_by_role('button', name='Works').is_visible()
+        assert doc.locator('iframe').get_attribute('sandbox') == 'allow-scripts allow-popups'
+        doc.close()
+        page.uncheck('#it-case-1')
+        page.wait_for_function("document.querySelector('#first').dataset.item === 'case-1'")
+        page.close()
+    finally:
+        github.close()
+
+
 class FakeGitHub:
     """Enough of the Contents API for the page: GET returns content + sha, PUT checks the sha and records the body."""
 

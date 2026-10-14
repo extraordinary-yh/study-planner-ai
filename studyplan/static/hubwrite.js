@@ -98,6 +98,18 @@
     return res;
   };
 
+  HubWriter.prototype.itemDecision = function (o) {
+    var reason = (o.reason || "").trim(), ts = this.now();
+    if (!["applicable", "not_applicable"].includes(o.state) || !reason || reason.length > 1000) throw new Error("A reason of 1–1000 characters is required.");
+    return this.editJson("study-plan/plans/" + o.date + ".json", function (plan) {
+      var block = plan.blocks.find(b => b.id === o.block);
+      var item = block && block.items.find(i => i.id === o.item);
+      if (!item) throw new Error("Unknown item");
+      (item.decisions ||= []).push({state: o.state, reason: reason, ts: ts, source: "hub"});
+      return plan;
+    }, "hub: " + o.date + " item decision " + o.item);
+  };
+
   /* Move / resize a block in the day's plan JSON; the day becomes arranged by hand. */
   HubWriter.prototype.moveBlock = function (o) {
     var what = [];

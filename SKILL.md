@@ -37,3 +37,15 @@ Avoid assigning unrelated work merely to fill a quota.
 ## Session end
 Provide the board URL and the local plan link. Keep private learning history out of public commits.
 Test code changes with `uv run pytest -q`; run the privacy check before publishing source changes.
+
+## Chat-led learning flow
+
+For a study request, reuse the existing daily plan and learner steps. Run `uv run studyplan --date YYYY-MM-DD session show`, read the matching step in `sessions/YYYY-MM-DD.json`, and resume the saved question and checkpoint. If there is no prepared day, curate it first; do not treat a generated skeleton as a completed lesson.
+
+Ask the current question directly in the chat. Update it with `session question --block BLOCK --item ITEM --text "Question"`, using the global `--date` before `session`. Interpret each reply against the question actually asked, offer the feedback needed for another attempt, and ask one next question. Keep a multi-question exercise active until it is actually complete.
+
+Save observed evidence with `session checkpoint --text "Evidence and remaining gap" --assistance guided|independent|unrecorded`. Complete only after an actual attempt or an explicit completion report. Pause, skip with a reason, and undo preserve history. A checkbox and an expired timer do not prove mastery or actual study time. Respect requests to pause or stop.
+
+Open `http://127.0.0.1:8765/study?date=YYYY-MM-DD` alongside the chat. The learner page shows the current question, optional persistent timer and quiet controls; the calendar remains available. Asking a question does not start the timer. Start/Pause controls timing, and Restart at zero starts the same step's full timebox. This page does not send messages to an agent.
+
+Learner content lives in ignored `sessions/YYYY-MM-DD.json`, keyed by plan item ID. Keep private case facts and answer keys in ignored `coaching/`; never put them in learner prompts, resources, or checkpoints. During mocks, reveal only requested facts and reserve assessment for debrief. See [the session format](docs/study-sessions.md). Exported hub pages are read-only views with a link back to the local session.

@@ -23,7 +23,7 @@ def roots(tmp_path, monkeypatch):
     term_path.write_text(yaml.safe_dump(terms))
 
     shutil.copy(FIXTURES / "preferences.yaml", root / "profile" / "preferences.yaml")
-    shutil.copy(FIXTURES / "level_blank.yaml", root / "profile" / "level.yaml")   # tests start from an unassessed Mark
+    shutil.copy(FIXTURES / "level_blank.yaml", root / "profile" / "level.yaml")   # tests start from an unassessed learner
     (root / "profile" / "notes.md").unlink(missing_ok=True)
     (root / "profile" / "coaching.yaml").unlink(missing_ok=True)  # personal evidence is opt-in in scenario tests
     (root / "pyproject.toml").write_text("[project]\nname = 'x'\n")

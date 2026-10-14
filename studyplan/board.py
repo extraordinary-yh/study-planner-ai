@@ -58,14 +58,19 @@ class BoardError(Exception):
 # ---------------------------------------------------------------- the data the page gets
 
 def plan_payload(root: Path, date: str) -> dict[str, Any]:
+    from .session import load_lessons
     plan = load_plan(root, date)
     if plan is None:
         raise BoardError(f"no plan for {date}: run `uv run studyplan plan --date {date}`")
     apply_log(plan, logmod.done_targets(logmod.load(root / "data" / "log.jsonl"), date))   # hosted ticks live in the log
     data = to_dict(plan)
+    focused = load_lessons(root, date).get('steps', {})
     for block, payload in zip(plan.blocks, data["blocks"]):
         payload["gcal"] = gcal_url(date, block)
         payload["end"] = block.end
+        for item in payload['items']:
+            if item['id'] in focused:
+                item['session'] = True
     for event, payload in zip(plan.events, data["events"]):
         payload["end"] = event.end
     return data
@@ -133,14 +138,30 @@ def api_done(root: Path, body: dict[str, Any]) -> dict[str, Any]:
     date, plan = _load(root, body)
     block, item = _find(plan, str(body.get("block") or ""), body.get("item") or None)
     if item is not None:
+        if item.not_applicable:
+            raise BoardError("Restore this item before marking it done.")
         item.done = True
         entry = {"block": block.id, "minutes": 0, "note": f"item: {item.text}"[:200], "target": item.id, "item": item.id}
     else:
-        block.done = True
         minutes = body.get("minutes")
+        if any(i.not_applicable for i in block.items) and minutes is None:
+            raise BoardError("Enter actual study minutes for a block containing N/A items.")
+        block.done = True
         entry = {"block": block.id, "minutes": int(minutes) if minutes is not None else block.minutes,
                  "note": str(body.get("note") or ""), "target": block.id}
     logmod.append(root / "data" / "log.jsonl", {"ts": _now_iso(), "date": date, **entry, "source": "board"})
+    save_plan(root, plan)
+    return plan_payload(root, date)
+
+
+def api_item_decision(root: Path, body: dict[str, Any]) -> dict[str, Any]:
+    date, plan = _load(root, body)
+    _, item = _find(plan, str(body.get("block") or ""), body.get("item") or None)
+    state = body.get("state")
+    reason = str(body.get("reason") or "").strip()
+    if item is None or state not in ("applicable", "not_applicable") or not reason or len(reason) > 1000:
+        raise BoardError("Choose an item and a valid state, with a reason (1–1000 characters).")
+    item.decisions.append({"state": state, "reason": reason, "ts": _now_iso(), "source": "board"})
     save_plan(root, plan)
     return plan_payload(root, date)
 
@@ -214,7 +235,7 @@ def render_html(plan: dict[str, Any], hub: dict[str, Any] | None = None, *, repo
                           ensure_ascii=False).replace("<", "\\u003c")
     return (HTML.replace("__PLAN__", blob).replace("__HUB__", hub_blob).replace("__REPORTS__", rep_blob)
             .replace("__DATE__", plan["date"]).replace("__NAV__", nav).replace("__PANELS__", panels)
-            .replace("__TIMELINE_JS__", timeline_js()).replace("__SCRIPTS__", scripts))
+            .replace("__GLASS_THEME__", glass_css()).replace("__TIMELINE_JS__", timeline_js()).replace("__SCRIPTS__", scripts))
 
 
 def render_no_plan_html(date: str, message: str) -> str:
@@ -224,6 +245,10 @@ def render_no_plan_html(date: str, message: str) -> str:
             "<style>body{font:14px/1.5 ui-sans-serif,-apple-system,sans-serif;padding:40px;color:#333}code{font-family:ui-monospace,monospace}</style>"
             "</head><body><h1>No plan for " + d + "</h1><p>" + htmlmod.escape(message) + "</p>"
             "<p><a href=\"/\">Back to the served day</a></p></body></html>")
+
+
+def glass_css() -> str:
+    return (Path(__file__).parent / "static" / "glass.css").read_text()
 
 
 def hubwrite_js() -> str:
@@ -500,6 +525,9 @@ ul.items li.pop { animation:pop .3s ease-out }
 .dh .meta { color:var(--muted); font-size:12.5px; margin-top:3px; display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; font-variant-numeric:tabular-nums }
 .timer { display:inline-flex; align-items:center; gap:2px; border:1px solid var(--line); border-radius:var(--r-pill); padding:1px 4px 1px 2px; background:var(--panel) }
 .timer .ib { width:24px; height:24px } .timer .t { font-weight:650; font-variant-numeric:tabular-nums; min-width:52px; text-align:center; color:var(--fg) } .timer .t.over { color:var(--warn) }
+.item-action { display:block; margin-top:6px; }
+.current-item { border-left:3px solid var(--accent); }
+.action-note { padding:12px 0; }
 .first { display:flex; align-items:center; gap:9px; margin:14px 0 8px; padding:10px 14px; border-radius:var(--r-md); font-size:14px; font-weight:600; text-decoration:none; overflow-wrap:anywhere }
 a.first { background:var(--accent); color:var(--on-accent); box-shadow:var(--sh-1); transition:background .15s, transform .15s } a.first:hover { background:var(--accent-2); transform:translateY(-1px) }
 a.first .i { width:16px; height:16px } a.first small { font-weight:450; opacity:.8; font-size:12px; margin-left:auto; white-space:nowrap }
@@ -572,72 +600,7 @@ ul.items li.on span { color:var(--muted); text-decoration:line-through; text-dec
   .pane.open { transform:none } .tabs .back { display:inline-flex } .narrow { display:inline-flex }
   .bar { width:72px }
 }
-/* --- the Glin UI glass layer ------------------------------------------------------------------------------
- * The design uses Glin UI (glinui.com, MIT; github.com/glincker/glinui) as the look. It is a React library, so
- * its recipe is ported here as plain CSS with the values taken verbatim from packages/tokens/theme.css and
- * the button / card / glass-card variants: white glass at 8–35 % over a pastel mesh (sky, mint, lemon),
- * blur 8–40 px always paired with saturate(180 %), a brighter top border (the refraction edge), soft black
- * shadows, near-black solid for the primary state; dark mode is black glass at 20–70 % over the mesh dimmed.
- * The reports' token block above stays as it is; this layer re-points the semantic tokens the board uses
- * and adds the glass ones (`--g-*`). The lanes keep their hues as the chips' left edge. */
-:root {
-  --bg:oklch(0.985 0.002 240); --fg:oklch(0.23 0.01 248); --muted:oklch(0.44 0.012 248); --faint:oklch(0.56 0.012 248);
-  --line:rgb(15 23 42 / .09); --line-soft:rgb(15 23 42 / .05); --chip:rgb(255 255 255 / .55); --panel:rgb(255 255 255 / .7); --panel-2:rgb(255 255 255 / .5);
-  --accent:oklch(0.63 0.19 254); --accent-2:oklch(0.57 0.19 254); --accent-ink:oklch(0.47 0.18 254); --accent-soft:rgb(255 255 255 / .55); --on-accent:#fff;
-  --g-s1:rgb(255 255 255 / .08); --g-s2:rgb(255 255 255 / .12); --g-s3:rgb(255 255 255 / .18); --g-s4:rgb(255 255 255 / .25); --g-s5:rgb(255 255 255 / .35);
-  --g-border:rgb(255 255 255 / .2); --g-border-strong:rgb(255 255 255 / .35); --g-top:rgb(255 255 255 / .4); --g-edge:rgb(163 163 163 / .6);
-  --g-sat:180%; --g-sh-sm:0 2px 8px rgb(0 0 0 / .08); --g-sh-md:0 8px 24px rgb(0 0 0 / .12), 0 2px 4px rgb(0 0 0 / .08); --g-sh-lg:0 16px 48px rgb(0 0 0 / .16), 0 4px 8px rgb(0 0 0 / .08);
-  --g-btn:rgb(255 255 255 / .5); --g-btn-hover:rgb(255 255 255 / .6); --g-ring:rgb(255 255 255 / .4); --g-ring-hover:rgb(255 255 255 / .5);
-  --g-btn-sh:0 10px 22px -14px rgb(15 23 42 / .18); --g-btn-sh-hover:0 14px 26px -14px rgb(15 23 42 / .22); --g-hairline:rgb(255 255 255 / .7);
-  --g-liquid:radial-gradient(circle at 16% 12%, rgb(255 255 255 / .92), transparent 44%), linear-gradient(168deg, rgb(255 255 255 / .72), rgb(236 236 236 / .42));
-  --g-liquid-hover:radial-gradient(circle at 16% 12%, rgb(255 255 255 / .98), transparent 44%), linear-gradient(168deg, rgb(255 255 255 / .82), rgb(232 232 236 / .52));
-  --g-liquid-before:radial-gradient(circle at 80% 72%, rgb(255 255 255 / .5), transparent 50%), radial-gradient(circle at 36% 82%, rgb(226 232 240 / .4), transparent 56%);
-  --g-liquid-sh:0 1px 3px rgb(0 0 0 / .08), 0 0 0 1px rgb(255 255 255 / .5) inset, 0 14px 28px -16px rgb(15 23 42 / .22);
-  --g-liquid-sh-hover:0 2px 6px rgb(0 0 0 / .1), 0 0 0 1px rgb(255 255 255 / .6) inset, 0 18px 32px -18px rgb(15 23 42 / .26);
-  --g-sheen:rgb(255 255 255 / .9); --g-before-opacity:.85; --g-sheen-opacity:.7;
-  --g-card:radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / .16), transparent 50%), linear-gradient(to bottom, rgb(255 255 255 / .1), rgb(255 255 255 / .04));
-  --g-card-liquid:radial-gradient(circle at 16% 14%, rgb(255 255 255 / .72), transparent 46%), linear-gradient(165deg, rgb(255 255 255 / .58), rgb(238 238 238 / .32));
-  --g-frosted:radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / .32), transparent 50%), linear-gradient(to bottom, rgb(255 255 255 / .22), rgb(255 255 255 / .1));
-  /* Glin's landing mesh is .55 / .45 / .35; the user wants only a hint of it, so a quarter of that and the lemon barely there */
-  --g-mesh:radial-gradient(circle at 10% 8%, rgb(186 230 253 / .14), transparent 34%), radial-gradient(circle at 86% 82%, rgb(167 243 208 / .11), transparent 36%),
-    radial-gradient(circle at 48% 38%, rgb(254 240 138 / .05), transparent 40%), linear-gradient(150deg, rgb(255 255 255 / .85), rgb(255 255 255 / .55));
-  --g-orb-a:rgb(56 189 248 / .07); --g-orb-b:rgb(16 185 129 / .06); --g-orb-c:rgb(251 191 36 / .03);
-  --g-solid:oklch(0.2 0.01 248); --g-solid-hover:oklch(0.26 0.01 248); --g-on-solid:#fff; --g-solid-sh:0 12px 26px -16px rgb(2 6 23 / .65);
-  --g-ease:cubic-bezier(0.2, 0, 0, 1); --tint-l:0.93; --tint-c:0.03;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg:oklch(0.18 0.01 250); --fg:oklch(0.95 0.01 247); --muted:oklch(0.72 0.012 248); --faint:oklch(0.6 0.012 248);
-    --line:rgb(255 255 255 / .1); --line-soft:rgb(255 255 255 / .06); --chip:rgb(255 255 255 / .08); --panel:rgb(0 0 0 / .4); --panel-2:rgb(255 255 255 / .06);
-    --accent:oklch(0.74 0.19 252); --accent-2:oklch(0.8 0.17 252); --accent-ink:oklch(0.82 0.15 252); --accent-soft:rgb(255 255 255 / .1); --on-accent:oklch(0.15 0.01 252);
-    --g-s1:rgb(0 0 0 / .2); --g-s2:rgb(0 0 0 / .3); --g-s3:rgb(0 0 0 / .4); --g-s4:rgb(0 0 0 / .55); --g-s5:rgb(0 0 0 / .7);
-    --g-border:rgb(255 255 255 / .1); --g-border-strong:rgb(255 255 255 / .18); --g-top:rgb(255 255 255 / .15); --g-edge:rgb(255 255 255 / .12);
-    --g-sh-sm:0 2px 8px rgb(0 0 0 / .3); --g-sh-md:0 8px 24px rgb(0 0 0 / .35); --g-sh-lg:0 12px 36px rgb(0 0 0 / .4);
-    --g-btn:linear-gradient(155deg, rgb(255 255 255 / .1), rgb(255 255 255 / .04)); --g-btn-hover:linear-gradient(155deg, rgb(255 255 255 / .14), rgb(255 255 255 / .06));
-    --g-ring:rgb(255 255 255 / .08); --g-ring-hover:rgb(255 255 255 / .12); --g-btn-sh:0 8px 20px -12px rgb(0 0 0 / .5); --g-btn-sh-hover:0 12px 28px -12px rgb(0 0 0 / .55); --g-hairline:rgb(255 255 255 / .2);
-    --g-liquid:linear-gradient(168deg, rgb(255 255 255 / .14), rgb(255 255 255 / .05)); --g-liquid-hover:linear-gradient(168deg, rgb(255 255 255 / .18), rgb(255 255 255 / .07));
-    --g-liquid-sh:0 0 0 1px rgb(255 255 255 / .1) inset, 0 10px 24px -12px rgb(0 0 0 / .5);
-    --g-liquid-sh-hover:0 0 0 1px rgb(255 255 255 / .2), 0 0 0 1px rgb(255 255 255 / .14) inset, 0 14px 30px -12px rgb(0 0 0 / .55);
-    --g-before-opacity:.55; --g-sheen-opacity:.4;
-    --g-card:radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / .05), transparent 50%), linear-gradient(to bottom, rgb(255 255 255 / .03), rgb(255 255 255 / .01));
-    --g-card-liquid:linear-gradient(165deg, rgb(255 255 255 / .12), rgb(255 255 255 / .05));
-    --g-frosted:radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / .1), transparent 50%), linear-gradient(to bottom, rgb(255 255 255 / .06), rgb(255 255 255 / .02));
-    --g-mesh:radial-gradient(circle at 12% 8%, rgb(14 116 144 / .24), transparent 35%), radial-gradient(circle at 88% 84%, rgb(5 150 105 / .2), transparent 37%),
-      radial-gradient(circle at 52% 38%, rgb(202 138 4 / .16), transparent 42%), linear-gradient(150deg, rgb(255 255 255 / .08), rgb(255 255 255 / .02));
-    --g-orb-a:rgb(34 211 238 / .2); --g-orb-b:rgb(52 211 153 / .18); --g-orb-c:rgb(253 224 71 / .14);
-    --g-solid:oklch(0.93 0.005 248); --g-solid-hover:#fff; --g-on-solid:oklch(0.15 0.01 248); --g-solid-sh:0 10px 24px -14px rgb(255 255 255 / .28);
-    --tint-l:0.3; --tint-c:0.05;
-  }
-}
-/* the mesh and three floating orbs behind everything, as on glinui.com's landing */
-body::before, body::after, .orb { content:""; position:fixed; z-index:-1; pointer-events:none }
-body::before { inset:0; background:var(--g-mesh), var(--bg) }
-body::after { left:-8vw; top:-10vh; width:44vw; height:44vw; border-radius:50%; background:var(--g-orb-a); filter:blur(60px); animation:orbFloat 8s ease-in-out infinite }
-.orb { border-radius:50%; filter:blur(60px) } .orb.b { right:-10vw; bottom:-12vh; width:40vw; height:40vw; background:var(--g-orb-b); animation:orbFloatReverse 9s ease-in-out infinite }
-.orb.c { left:38vw; top:30vh; width:28vw; height:28vw; background:var(--g-orb-c); animation:orbGlow 7s ease-in-out infinite }
-@keyframes orbFloat { 0%, 100% { transform:translateY(0) } 50% { transform:translateY(-12px) } }
-@keyframes orbFloatReverse { 0%, 100% { transform:translateY(-6px) } 50% { transform:translateY(8px) } }
-@keyframes orbGlow { 0%, 100% { opacity:.55; transform:scale(1) } 50% { opacity:.9; transform:scale(1.08) } }
+__GLASS_THEME__
 /* surfaces: glass-4 for the sticky header, glass-3 for the pane, frosted for the menu and the hub's panels */
 .hdr { background:var(--g-s4); border-bottom:1px solid var(--g-border); box-shadow:var(--g-sh-sm); backdrop-filter:saturate(var(--g-sat)) blur(24px); -webkit-backdrop-filter:saturate(var(--g-sat)) blur(24px) }
 .tl { background:transparent; border-right:1px solid var(--g-border) }
@@ -845,6 +808,16 @@ function noteWrite(res) {
   if (res.line) line.appendChild(el("code", null, res.line));
   box.prepend(line);
 }
+function isNA(it) { const ds = it.decisions || []; return ds.length > 0 && ds[ds.length - 1].state === "not_applicable"; }
+function activeItems(b) { return b.items.filter(i => !isNA(i)); }
+function resolved(b) { return b.done || (b.items.some(isNA) && b.items.every(i => i.done || isNA(i))); }
+function remainingMinutes(b) {
+  if (resolved(b)) return 0;
+  if (!b.items.some(isNA)) return b.minutes;
+  const pending = activeItems(b).filter(i => !i.done);
+  return pending.reduce((sum, i) => { const m = i.text.match(/\b(\d+)\s*min(?:ute)?s?\b/i); return sum + (m ? Number(m[1]) : b.minutes / b.items.length); }, 0);
+}
+function itemSummary(b) { const active = activeItems(b), skipped = b.items.length - active.length; return active.filter(i => i.done).length + "/" + active.length + " items" + (skipped ? " · " + skipped + " 暂不做" : "") + (!b.done && resolved(b) ? " · 无待做项" : ""); }
 /* Apply a write to PLAN before the network round trip, so the tick shows at once; the caller reverts on failure. */
 function applyLocal(path, body) {
   const b = PLAN.blocks.find(x => x.id === body.block);
@@ -852,6 +825,9 @@ function applyLocal(path, body) {
   if (path === "/api/done" || path === "/api/undo") {
     const on = path === "/api/done";
     if (body.item) { const it = b.items.find(i => i.id === body.item); if (it) it.done = on; } else b.done = on;
+  } else if (path === "/api/item-decision") {
+    const it = b.items.find(i => i.id === body.item);
+    if (it) (it.decisions ||= []).push({state: body.state, reason: body.reason, ts: new Date().toISOString(), source: "hub"});
   } else if (path === "/api/block") {
     if (body.start != null) b.start = hhmm(snap(mins(body.start)));
     if (body.minutes != null) b.minutes = Math.max(SNAP, snap(body.minutes));
@@ -872,6 +848,8 @@ async function postHosted(path, body) {
       const it = body.item ? (b.items || []).find(i => i.id === body.item) : null;
       res = await w.tick({ date: DATE, block: body.block, item: body.item, text: it ? it.text : "", undo: path === "/api/undo",
                            minutes: body.item ? 0 : (body.minutes == null ? b.minutes : body.minutes), note: body.note || "" });
+    } else if (path === "/api/item-decision") {
+      res = await w.itemDecision({ date: DATE, ...body });
     } else if (path === "/api/block") {
       res = await w.moveBlock({ date: DATE, block: body.block, start: b.start, minutes: b.minutes, title: body.title });
     } else throw new Error("no hosted route for " + path);
@@ -910,16 +888,48 @@ function inline(s) {
     .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
     .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
 }
-function fileHref(raw) {
-  if (!raw || /^(?:https?:|mailto:|#)/.test(raw) || MODE !== "live") return raw;
-  if (raw === "../profile/notes.md") return "/files/study-plan/profile/notes.md";
-  if (raw.startsWith("study-plan/")) return "/files/" + raw;
-  const resolved = new URL(raw, location.origin + "/files/study-plan/");
-  return resolved.pathname + resolved.search + resolved.hash;
+function fileHref(raw, action = true) {
+  if (!raw) return "";
+  if (/^(?:https?:|mailto:|#)/i.test(raw)) return raw;
+  if (/^[a-z][a-z0-9+.-]*:|^\/\//i.test(raw)) return "";
+  // Exported destinations already point into the hub's files directory.
+  if (MODE !== "live" && raw.startsWith("../files/")) return raw;
+  let path = raw;
+  if (path.startsWith("/files/")) path = path.slice(7);
+  else if (path.startsWith("/")) return "";
+  else if (path.startsWith("./") || path.startsWith("../")) path = "study-plan/" + path;
+  else if (action && !/^(study-plan\/|profile\/(context|stories)\/|reports\/)/.test(path)) path = "study-plan/" + path;
+  const resolved = new URL(path, "https://study.invalid/");
+  path = decodeURIComponent(resolved.pathname.slice(1));
+  if (path.split("/").some(p => p.startsWith("."))) return "";
+  const key = path + resolved.hash;
+  if (MODE === "live") return "/files/" + path.split("/").map(encodeURIComponent).join("/") + resolved.hash;
+  return HUB_FILES[key] || (HUB_FILES[path] ? HUB_FILES[path].split("#")[0] + resolved.hash : "");
 }
 function firstUrl(s) {
-  const md = /\]\(([^)\s]+)\)/.exec(s); if (md) return fileHref(md[1]);
-  const bare = /(https?:\/\/[^\s<)`]+)/.exec(s); return bare ? bare[1] : "";
+  const md = /\]\(([^)]+)\)/.exec(s); if (md) return fileHref(md[1]);
+  const bare = /(https?:\/\/[^\s<)`]+)/.exec(s); if (bare) return bare[1];
+  const local = /(?:\.{1,2}\/|study-plan\/|profile\/|docs\/|reports\/|exercises\/)[^\s`<>]+/.exec(s);
+  return local ? fileHref(local[0].replace(/[.,;]+$/, "")) : "";
+}
+function nextAction(b) {
+  if (b.done) return null;
+  const item = b.items.find(i => !i.done && !isNA(i));
+  if (b.items.length && !item) return null;
+  if (item && item.session) return {item, url: sessionHref(b, item), text: item.first_action || "Open study step"};
+  const explicit = item && (item.action_url || firstUrl(item.first_action || ""));
+  const first = item === b.items[0];
+  const url = (item && item.action_url ? fileHref(item.action_url) : explicit) ||
+    (first ? firstUrl(b.first_action) : "") ||
+    (item && (item.refs || []).map(r => fileHref(r, false)).find(Boolean)) ||
+    firstUrl(b.first_action) || (b.links.length ? fileHref(b.links[0].url) : "");
+  const text = item && item.first_action ? item.first_action :
+    (first && b.first_action ? b.first_action : item ? item.text : b.first_action);
+  return {item, url, text};
+}
+function sessionHref(b, item) {
+  return MODE === "live" ? "/study?" + new URLSearchParams({date:DATE, block:b.id, item:item.id}) :
+    "../sessions/" + encodeURIComponent(DATE) + "/" + encodeURIComponent(item.id) + ".html";
 }
 
 /* The artifacts behind an item: a URL opens in a new tab; a repo path is shown as the file (the hub site links it). */
@@ -931,8 +941,8 @@ function refNodes(refs) {
       a.href = r; a.target = "_blank"; a.rel = "noopener"; a.title = r; wrap.appendChild(a);
     } else {
       const label = r.split("#")[0].split("/").pop() + (r.includes("#") ? " › " + r.split("#")[1] : "");
-      const link = HUB_FILES[r];
-      if (link || MODE === "live") { const a = el("a", null, label); a.href = link || ("/files/" + r); a.title = r; wrap.appendChild(a); }
+      const link = fileHref(r, false);
+      if (link) { const a = el("a", null, label); a.href = link; a.title = r; wrap.appendChild(a); }
       else { const c = el("code", null, label); c.title = r; wrap.appendChild(c); }
     }
   });
@@ -1097,15 +1107,15 @@ function eventNode(e) {
 function blockNode(b) {
   const n = chipNode("blk", b.id, laneOf(b.id), mins(b.start), mins(b.start) + b.minutes);
   const done = b.items.filter(i => i.done).length;
-  const overdue = IS_TODAY && !b.done && mins(b.start) + b.minutes < nowMin();
+  const overdue = IS_TODAY && !resolved(b) && mins(b.start) + b.minutes < nowMin();
   if (b.done) n.classList.add("done");
   if (overdue) n.classList.add("over");
   if (timers[b.id] && timers[b.id].running) n.classList.add("running");
   const txt = el("div", "txt");
   const t = el("div", "t"); if (b.done) t.appendChild(icon("check")); t.appendChild(el("span", null, b.title)); txt.appendChild(t);
-  txt.appendChild(el("div", "m", b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + done + "/" + b.items.length : "") + (overdue ? " · overdue" : "")));
+  txt.appendChild(el("div", "m", b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + itemSummary(b) : "") + (overdue ? " · overdue" : "")));
   n.appendChild(txt);
-  n.title = b.title + "\n" + b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + done + "/" + b.items.length + " items" : "");
+  n.title = b.title + "\n" + b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + itemSummary(b) : "");
   const rz = el("div", "rz"); n.appendChild(rz);
   n.addEventListener("pointerdown", e => { if (e.target === rz) startDrag(e, n, b, "resize"); else startDrag(e, n, b, "move"); });
   n.addEventListener("keydown", chipKeys);
@@ -1124,8 +1134,8 @@ function chipKeys(e) {
 }
 function tickNext(id) {
   const b = PLAN.blocks.find(x => x.id === id); if (!b) return;
-  const it = b.items.find(i => !i.done);
-  if (!it) { toast("every item is ticked"); return; }
+  const it = b.items.find(i => !i.done && !isNA(i));
+  if (!it) { toast("没有待做项"); return; }
   const streakInfo = handleItemDone(it.id);
   fxHeroCelebrate(it.text, streakInfo, false);
   post("/api/done", { block: b.id, item: it.id }).then(() => toast("logged: " + it.text.slice(0, 40))).catch(() => {});
@@ -1271,7 +1281,7 @@ function blockDetail(box, b) {
   const dh = el("div", "dh"); dh.style.setProperty("--h", laneOf(b.id));
   dh.appendChild(el("h2", null, b.title));
   const meta = el("div", "meta");
-  meta.appendChild(el("span", null, b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + done + "/" + b.items.length + " items" : "") + (b.done ? " · done" : "")));
+  meta.appendChild(el("span", null, b.start + "–" + b.end + " · " + b.minutes + " min" + (b.items.length ? " · " + itemSummary(b) : "") + (b.done ? " · done" : "")));
   const t = timerOf(b);
   const timer = el("span", "timer");
   const pb = el("button", "ib"); pb.type = "button"; pb.title = t.running ? "pause" : "start the timer"; pb.setAttribute("aria-label", pb.title); pb.appendChild(icon(t.running ? "pause" : "play"));
@@ -1282,23 +1292,28 @@ function blockDetail(box, b) {
   timer.appendChild(pb); timer.appendChild(out); timer.appendChild(rb);
   meta.appendChild(timer);
   dh.appendChild(meta); box.appendChild(dh);
-  if (b.first_action) {
-    const url = firstUrl(b.first_action);
-    if (url) {
-      const a = el("a", "first"); a.href = url; a.target = "_blank"; a.rel = "noopener"; a.id = "first";
-      a.appendChild(icon("go")); const s = el("span"); s.innerHTML = "First action · " + inline(b.first_action).replace(/<a [^>]*>|<\/a>/g, ""); a.appendChild(s); a.appendChild(el("small", null, "2 min"));
-      box.appendChild(a);
-    } else {
-      const d = el("div", "first"); d.id = "first"; d.appendChild(icon("go")); const s = el("span"); s.innerHTML = "First action · " + inline(b.first_action); d.appendChild(s); d.appendChild(el("small", null, "2 min"));
-      box.appendChild(d);
-    }
+  const action = nextAction(b);
+  if (action) {
+    const a = el(action.url ? "a" : "div", action.url ? "first" : "action-note"); a.id = "first";
+    if (action.url) { a.href = action.url; a.target = "_blank"; a.rel = "noopener"; }
+    a.dataset.item = action.item ? action.item.id : "";
+    a.appendChild(icon("go"));
+    const label = el("span"); label.innerHTML = "Next action · " + inline(action.text).replace(/<a [^>]*>|<\/a>/g, "");
+    a.appendChild(label);
+    if (action.item) a.appendChild(el("small", null, "Step " + (b.items.indexOf(action.item) + 1) + " of " + b.items.length));
+    box.appendChild(a);
+    if (!action.url) box.appendChild(el("p", "muted", "Do this step here; no document is attached."));
+  } else if (b.items.length) {
+    const finished = el("p", "action-note", b.done ? "Block completed." : "All steps resolved. Record the block when you are ready.");
+    finished.id = "actions-complete"; box.appendChild(finished);
   }
   if (b.description.length) box.appendChild(descNodes(b.description));
   if (b.items.length) {
     const ul = el("ul", "items");
     b.items.forEach(it => {
-      const li = el("li", it.done ? "on" : null);
-      const cb = el("input"); cb.type = "checkbox"; cb.checked = it.done; cb.id = "it-" + it.id; cb.disabled = READONLY;
+      const li = el("li", it.done ? "on" : action && action.item === it ? "current-item" : null);
+      if (action && action.item === it) li.setAttribute("aria-current", "step");
+      const cb = el("input"); cb.type = "checkbox"; cb.checked = it.done; cb.id = "it-" + it.id; cb.disabled = READONLY || isNA(it);
       cb.addEventListener("change", () => {
         if (cb.checked) {
           const streakInfo = handleItemDone(it.id);
@@ -1314,16 +1329,38 @@ function blockDetail(box, b) {
       });
       const lab = el("label"); lab.htmlFor = cb.id; lab.style.flex = "1"; lab.style.cursor = READONLY ? "default" : "pointer";
       const sp = el("span"); sp.innerHTML = inline(it.text);
-      if (it.refs && it.refs.length) sp.appendChild(refNodes(it.refs));
+      if (!it.session && it.refs && it.refs.length) sp.appendChild(refNodes(it.refs));
       lab.appendChild(sp);
+      if (it.first_action || it.action_url) {
+        const target = it.session ? sessionHref(b, it) : fileHref(it.action_url) || firstUrl(it.first_action || "");
+        if (target) {
+          const open = el("a", "item-action", it.first_action || "Open this step");
+          open.href = target; open.target = "_blank"; open.rel = "noopener";
+          lab.appendChild(open);
+        }
+      }
+      if (isNA(it)) {
+        lab.prepend(el("strong", "muted", "暂不做 / N/A · "));
+        lab.appendChild(el("div", "muted", it.decisions[it.decisions.length - 1].reason));
+      }
+      const decision = el("button", "pill", isNA(it) ? "恢复待做" : "暂不做");
+      decision.type = "button"; decision.disabled = READONLY;
+      decision.addEventListener("click", () => {
+        const reason = window.prompt(isNA(it) ? "为什么重新安排这项？" : "为什么暂不做？保留原因，帮助以后排计划。");
+        if (!reason || !reason.trim()) return;
+        post("/api/item-decision", {block: b.id, item: it.id, state: isNA(it) ? "applicable" : "not_applicable", reason: reason.trim()}).catch(() => {});
+      });
+      lab.appendChild(decision);
       li.appendChild(cb); li.appendChild(lab); ul.appendChild(li);
     });
     box.appendChild(ul);
   }
   if (b.links.length) {
+    const focused = b.items.some(i => i.session);
     const links = el("div", "links");
-    b.links.forEach(l => { const a = el("a", "pill"); a.href = fileHref(l.url); a.target = "_blank"; a.rel = "noopener"; a.appendChild(icon("out")); a.appendChild(el("span", null, l.label)); links.appendChild(a); });
-    box.appendChild(links);
+    b.links.forEach(l => { const a = el("a", "pill"); a.href = fileHref(l.url); a.target = "_blank"; a.rel = "noopener"; a.appendChild(icon("out")); a.appendChild(el("span", null, focused ? l.label.replace(/^Required today: /, "Archive: ") : l.label)); links.appendChild(a); });
+    if (focused) { const archive = el("details"); archive.appendChild(el("summary", "muted", "Full packet · reference archive")); archive.appendChild(links); box.appendChild(archive); }
+    else box.appendChild(links);
   }
   const tools = el("div", "tools");
   const doneBtn = el("button", "btn" + (b.done ? " on" : "")); doneBtn.type = "button"; doneBtn.id = "done-btn"; doneBtn.disabled = READONLY;
@@ -1334,10 +1371,17 @@ function blockDetail(box, b) {
         .then(() => toast("block reopened"))
         .catch(() => {});
     } else {
+      let minutes = b.minutes;
+      if (b.items.some(isNA)) {
+        const answer = window.prompt("包含暂不做项：实际学习了多少分钟？", "0");
+        if (answer === null) return;
+        minutes = Number(answer);
+        if (!answer.trim() || !Number.isInteger(minutes) || minutes < 0) { toast("请输入非负整数分钟", true); return; }
+      }
       const streakInfo = handleItemDone(b.id);
       fxSingularitySupernova(b.title, b.minutes, streakInfo, doneBtn);
-      post("/api/done", { block: b.id })
-        .then(() => toast("logged " + b.minutes + " min of " + b.id))
+      post("/api/done", { block: b.id, minutes })
+        .then(() => toast("logged " + minutes + " min of " + b.id))
         .catch(() => {});
     }
   });
@@ -1375,16 +1419,17 @@ function eventDetail(box, e) {
 function summary(box) {
   box.classList.add("empty");
   const total = PLAN.blocks.reduce((a, b) => a + b.minutes, 0), doneMin = PLAN.blocks.filter(b => b.done).reduce((a, b) => a + b.minutes, 0);
-  box.appendChild(el("h2", null, fmtDate(DATE, true) + " · " + total + " min planned · " + (total - doneMin) + " min left"));
+  box.appendChild(el("h2", null, fmtDate(DATE, true) + " · " + total + " min planned · " + Math.ceil(PLAN.blocks.reduce((sum, b) => sum + remainingMinutes(b), 0)) + " min left"));
   const now = IS_TODAY ? nowMin() : -1;
   const byTime = PLAN.blocks.slice().sort((a, b) => mins(a.start) - mins(b.start));
-  const next = byTime.find(b => !b.done && mins(b.start) + b.minutes > now) || byTime.find(b => !b.done);
+  const next = byTime.find(b => !resolved(b) && mins(b.start) + b.minutes > now) || byTime.find(b => !resolved(b));
   if (next) {
     box.appendChild(el("h3", null, "Next"));
     const card = el("div", "next"); card.tabIndex = 0; card.setAttribute("role", "button");
     card.appendChild(el("b", null, next.title));
     card.appendChild(el("span", "sub", next.start + "–" + next.end + " · " + next.minutes + " min"));
-    if (next.first_action) { const s = el("span", "sub"); s.innerHTML = "First action · " + inline(next.first_action); card.appendChild(s); }
+    const upcoming = nextAction(next);
+    if (upcoming) { const s = el("span", "sub"); s.innerHTML = "Next action · " + inline(upcoming.text); card.appendChild(s); }
     const open = () => { select(next.id); $("#blk-" + CSS.escape(next.id)) && $("#blk-" + CSS.escape(next.id)).scrollIntoView({ block: "nearest" }); };
     card.addEventListener("click", open); card.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); open(); } });
     box.appendChild(card);
@@ -1393,8 +1438,8 @@ function summary(box) {
   const lanes = el("div", "lanes");
   PLAN.blocks.forEach(b => {
     const n = el("span", "n", b.title); lanes.appendChild(n);
-    const bar = el("span", "bar"); bar.style.setProperty("--h", laneOf(b.id)); const i = el("i"); i.style.width = (b.done ? 100 : (b.items.length ? Math.round(100 * b.items.filter(x => x.done).length / b.items.length) : 0)) + "%"; bar.appendChild(i); lanes.appendChild(bar);
-    lanes.appendChild(el("span", "v", b.minutes + " min" + (b.done ? " · done" : (b.items.length ? " · " + b.items.filter(x => x.done).length + "/" + b.items.length : ""))));
+    const bar = el("span", "bar"); bar.style.setProperty("--h", laneOf(b.id)); const i = el("i"); i.style.width = (b.done ? 100 : (b.items.length ? Math.round(100 * activeItems(b).filter(x => x.done).length / Math.max(1, activeItems(b).length)) : 0)) + "%"; bar.appendChild(i); lanes.appendChild(bar);
+    lanes.appendChild(el("span", "v", b.minutes + " min" + (b.done ? " · done" : (b.items.length ? " · " + itemSummary(b) : ""))));
   });
   box.appendChild(lanes);
   if (PLAN.radar.length) { box.appendChild(el("h3", null, "Radar")); const ul = el("ul"); PLAN.radar.forEach(r => { const li = el("li"); li.innerHTML = inline(r); ul.appendChild(li); }); box.appendChild(ul); }
@@ -2172,20 +2217,8 @@ def make_handler(root: Path, default_date: str):
             if not parts or any(part in ("", ".", "..") or part.startswith(".") for part in parts):
                 self._json(404, {"error": "file not available"})
                 return
-            base = root if ref.startswith("study-plan/") else parent
-            relative = ref[len("study-plan/"):] if ref.startswith("study-plan/") else ref
-            src = (base / relative).resolve()
-            try:
-                src.relative_to(base.resolve())
-            except ValueError:
-                self._json(404, {"error": "file not available"})
-                return
-            if not src.is_file() or (src.suffix.lower() != ".md" and ref not in (
-                    "study-plan/config/curriculum.yaml", "study-plan/data/leetcode.jsonl")):
-                self._json(404, {"error": "file not available"})
-                return
             from .hub import render_file_page  # local import avoids board ↔ hub import cycle
-            page = render_file_page(ref, root, parent)
+            page = render_file_page(ref, root, parent, live=True)
             if page is None:
                 self._json(404, {"error": "file not available"})
                 return
@@ -2215,6 +2248,14 @@ def make_handler(root: Path, default_date: str):
                     self._file("study-plan/" + ref if ref == "profile/notes.md" else ref)
                 elif url.path == "/api/plan":
                     self._json(200, plan_payload(root, self._date(query)))
+                elif url.path in ("/study", "/api/session"):
+                    from .session import session_payload, render_session
+                    payload = session_payload(root, self._date(query), (query.get('block') or [''])[0],
+                                              (query.get('item') or [''])[0], follow=query.get('follow') == ['1'])
+                    if url.path == '/study':
+                        self._send(200, render_session(payload).encode(), 'text/html; charset=utf-8')
+                    else:
+                        self._json(200, payload)
                 elif url.path == "/favicon.ico":
                     self._send(200, b"\xf0\x9f\x93\x85", "text/plain; charset=utf-8")
                 elif url.path == "/api/busy":
@@ -2223,19 +2264,27 @@ def make_handler(root: Path, default_date: str):
                     self._json(200, {"date": self._date(query), "rows": log_rows(root, self._date(query))})
                 else:
                     self._json(404, {"error": f"no route {url.path}"})
-            except BoardError as e:
+            except (BoardError, ValueError) as e:
                 self._json(400, {"error": str(e)})
             except Exception as e:                                        # noqa: BLE001 - the page shows the message
                 self._json(500, {"error": f"{type(e).__name__}: {e}"})
 
         def do_POST(self) -> None:  # noqa: N802
-            routes = {"/api/done": api_done, "/api/undo": api_undo, "/api/block": api_block}
+            from .session import api_session
+            routes = {"/api/item-decision": api_item_decision, "/api/done": api_done, "/api/undo": api_undo, "/api/block": api_block,
+                      "/api/session": api_session}
             url = urlparse(self.path)
             fn = routes.get(url.path)
             if fn is None:
                 self._json(404, {"error": f"no route {url.path}"})
                 return
             try:
+                if url.path == '/api/session':
+                    origin = self.headers.get('Origin')
+                    if origin and urlparse(origin).netloc != self.headers.get('Host'):
+                        raise BoardError('Use the study board on this computer to update a session.')
+                    if self.headers.get('Content-Type', '').split(';')[0] != 'application/json':
+                        raise BoardError('Session updates require JSON.')
                 body = self._body()
                 body.setdefault("date", default_date)
                 self._json(200, fn(root, body))

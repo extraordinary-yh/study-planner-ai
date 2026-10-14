@@ -26,6 +26,18 @@ plan=Plan(date=today,minutes=80,radar=["FICTIONAL DEMO · no real learner histor
 issues=quality_issues(plan)
 if issues: raise RuntimeError(issues)
 save_plan(workspace,plan)
+import json
+from studyplan.session import session_payload, render_session
+session_dir = workspace / "sessions"
+session_dir.mkdir(exist_ok=True)
+steps = {}
+for block in blocks:
+    for item in block.items:
+        steps[item.id] = {"title": item.text, "goal": block.description[0],
+                          "prompt": "Fictional practice: " + item.text + ". What would you try first?",
+                          "resources": block.links}
+(session_dir / f"{today}.json").write_text(json.dumps({"steps": steps}, indent=2))
+(workspace / "focus.html").write_text(render_session(session_payload(workspace, today)))
 preview=workspace/"preview.html"
 preview.write_text(render_html(plan_payload(workspace,today)))
 print(f"Fictional demo: {preview}")
